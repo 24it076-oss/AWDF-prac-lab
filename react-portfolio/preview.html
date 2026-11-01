@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React Student Portfolio | 4 Reusable Components</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- React 18 & ReactDOM Standalone -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel Standalone to compile JSX on the fly -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #fafafa;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f4f4f5;
+      --border-color: #e4e4e7;
+      --border-hover: #d4d4d8;
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --text-muted: #71717a;
+      --accent-color: #2563eb;
+      --accent-subtle: #eff6ff;
+      --badge-bg: #ecfdf5;
+      --badge-text: #065f46;
+      --badge-border: #a7f3d0;
+      --badge-dot: #10b981;
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #09090b;
+      --bg-surface: #121215;
+      --bg-subtle: #1c1c21;
+      --border-color: #27272a;
+      --border-hover: #3f3f46;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-color: #3b82f6;
+      --accent-subtle: rgba(59, 130, 246, 0.12);
+      --badge-bg: rgba(16, 185, 129, 0.1);
+      --badge-text: #34d399;
+      --badge-border: rgba(16, 185, 129, 0.25);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    .portfolio-app {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3.5rem 1.5rem;
+    }
+
+    /* Lab banner */
+    .lab-banner {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--accent-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .lab-badge {
+      background: var(--accent-color);
+      color: #fff;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.72rem;
+    }
+
+    /* Header Component */
+    .header-container {
+      padding: 1.75rem 0 1.5rem 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-logo span {
+      color: var(--accent-color);
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-item {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color var(--transition);
+    }
+
+    .nav-item:hover {
+      color: var(--text-primary);
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: border-color var(--transition);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      border: 1px solid var(--badge-border);
+      font-size: 0.775rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-top: 1.25rem;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--badge-dot);
+    }
+
+    /* Section */
+    .section-container {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-heading {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .section-tag {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    /* About Component */
+    .hero-greeting {
+      font-size: 2.35rem;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      margin-bottom: 0.4rem;
+    }
+
+    .highlight-text {
+      color: var(--accent-color);
+    }
+
+    .hero-role {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .hero-bio {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 0.925rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 0.25rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.55rem 1.15rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+      border: 1px solid var(--text-primary);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .social-links-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+
+    .social-link-pill {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-subtle);
+      border-radius: 5px;
+      transition: all var(--transition);
+    }
+
+    .social-link-pill:hover {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    /* Skills Component */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .skill-category-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+      transition: border-color var(--transition);
+    }
+
+    .category-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .skills-badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .skill-badge {
+      font-size: 0.775rem;
+      font-family: var(--font-mono);
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Projects Component */
+    .projects-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .project-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.35rem;
+      transition: all var(--transition);
+    }
+
+    .project-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .project-card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .card-link-btn {
+      font-size: 0.775rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-link-btn.highlight {
+      color: var(--accent-color);
+      background-color: var(--accent-subtle);
+      border-color: transparent;
+    }
+
+    .project-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .project-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .project-tag-pill {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    /* Footer Component */
+    .footer-container {
+      padding-top: 2.5rem;
+    }
+
+    .contact-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.75rem;
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .contact-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.925rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .contact-buttons-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+
+    .footer-subtext {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+      }
+      .nav-menu {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .social-links-row {
+        margin-left: 0;
+        width: 100%;
+      }
+      .contact-buttons-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React 18 JSX Application -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Structured Data
+    const portfolioData = {
+      student: {
+        name: "Rishi",
+        degree: "B.Tech in Information Technology",
+        semester: "5th Semester (3rd Year)",
+        university: "State Technical University",
+        statusText: "5th Sem IT Undergrad • Open for Internships",
+        bio: "Passionate 3rd-year engineering student with a strong foundation in Data Structures, Object-Oriented Programming, and Full-Stack Web Development. Currently building modern web applications with React and exploring scalable backend systems.",
+        cgpa: "8.4 / 10.0",
+        email: "rishi@example.com",
+        github: "https://github.com/your-username",
+        linkedin: "https://linkedin.com/in/your-username",
+        leetcode: "https://leetcode.com/your-username",
+      },
+      navLinks: [
+        { label: "About", href: "#about" },
+        { label: "Skills", href: "#skills" },
+        { label: "Projects", href: "#projects" },
+        { label: "Contact", href: "#contact" }
+      ],
+      skillCategories: [
+        {
+          title: "Programming Languages",
+          skills: ["C++", "Java", "Python", "JavaScript (ES6+)", "SQL"]
+        },
+        {
+          title: "Web & Frameworks",
+          skills: ["React.js", "Node.js", "Express.js", "HTML5 & CSS3", "REST APIs"]
+        },
+        {
+          title: "Databases & Tools",
+          skills: ["PostgreSQL", "MongoDB", "Git & GitHub", "Postman", "Linux"]
+        },
+        {
+          title: "Core CS Coursework",
+          skills: ["Data Structures & Algorithms", "DBMS", "Operating Systems", "Computer Networks", "OOP"]
+        }
+      ],
+      projects: [
+        {
+          id: 1,
+          title: "CampusHub — IT Resource & Event Portal",
+          description: "A collaborative portal for IT department students to exchange semester notes, previous question papers, and track hackathons.",
+          tags: ["React", "Node.js", "MongoDB", "Express"],
+          github: "https://github.com/your-username/campushub",
+          live: "https://campushub-demo.vercel.app"
+        },
+        {
+          id: 2,
+          title: "SnipLink — URL Shortener & Analytics",
+          description: "High-performance link compressor with click rate analytics, geo-referrer charts, and Redis caching.",
+          tags: ["Node.js", "PostgreSQL", "Redis", "REST API"],
+          github: "https://github.com/your-username/sniplink",
+          live: "https://sniplink-demo.vercel.app"
+        },
+        {
+          id: 3,
+          title: "AlgoVisualizer — Pathfinding & Sorting",
+          description: "Interactive visualizer for Dijkstra, BFS, and sorting algorithms built to reinforce semester exam concepts.",
+          tags: ["JavaScript", "HTML5 Canvas", "Algorithms"],
+          github: "https://github.com/your-username/algovisualizer",
+          live: "https://algovisualizer-demo.vercel.app"
+        }
+      ]
+    };
+
+    // =========================================================================
+    // 1. REUSABLE COMPONENT: Header
+    // =========================================================================
+    function Header({ name, statusText, navLinks, theme, onToggleTheme }) {
+      return (
+        <header className="header-container">
+          <div className="header-top">
+            <a href="#" className="brand-logo">
+              {name.charAt(0)}<span>.</span>
+            </a>
+            <nav className="nav-menu">
+              {navLinks.map((link, idx) => (
+                <a key={idx} href={link.href} className="nav-item">
+                  {link.label}
+                </a>
+              ))}
+              <button
+                onClick={onToggleTheme}
+                className="theme-toggle-btn"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
+            </nav>
+          </div>
+          {statusText && (
+            <div className="status-pill">
+              <span className="status-dot"></span>
+              <span>{statusText}</span>
+            </div>
+          )}
+        </header>
+      );
+    }
+
+    // =========================================================================
+    // 2. REUSABLE COMPONENT: About
+    // =========================================================================
+    function About({ student }) {
+      const { name, degree, semester, university, bio, cgpa, email, github, linkedin, leetcode } = student;
+      return (
+        <section id="about" className="section-container">
+          <div className="hero-content">
+            <h1 className="hero-greeting">
+              Hi, I'm <span className="highlight-text">{name}</span>
+            </h1>
+            <h2 className="hero-role">
+              {semester} &bull; {degree}
+            </h2>
+            <p className="hero-bio">{bio}</p>
+
+            <div className="hero-stats">
+              <div className="stat-card">
+                <span className="stat-label">Institution</span>
+                <span className="stat-value">{university}</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Academic Score</span>
+                <span className="stat-value">CGPA {cgpa}</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Current Focus</span>
+                <span className="stat-value">React &amp; DSA</span>
+              </div>
+            </div>
+
+            <div className="hero-actions">
+              <a href="#projects" className="btn btn-primary">View Projects</a>
+              <a href={`mailto:${email}`} className="btn btn-secondary">Email Me</a>
+              <div className="social-links-row">
+                <a href={github} target="_blank" rel="noreferrer" className="social-link-pill">GitHub ↗</a>
+                <a href={linkedin} target="_blank" rel="noreferrer" className="social-link-pill">LinkedIn ↗</a>
+                <a href={leetcode} target="_blank" rel="noreferrer" className="social-link-pill">LeetCode ↗</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // =========================================================================
+    // 3. REUSABLE COMPONENT: Skills
+    // =========================================================================
+    function SkillCategoryCard({ title, skills }) {
+      return (
+        <div className="skill-category-card">
+          <h3 className="category-title">{title}</h3>
+          <div className="skills-badge-list">
+            {skills.map((skill, index) => (
+              <span key={index} className="skill-badge">{skill}</span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function Skills({ categories }) {
+      return (
+        <section id="skills" className="section-container">
+          <div className="section-header">
+            <h2 className="section-heading">Technical Skills &amp; Coursework</h2>
+            <span className="section-tag">Semester V IT Stack</span>
+          </div>
+          <div className="skills-grid">
+            {categories.map((cat, idx) => (
+              <SkillCategoryCard
+                key={idx}
+                title={cat.title}
+                skills={cat.skills}
+              />
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    // =========================================================================
+    // BONUS REUSABLE COMPONENT: Projects
+    // =========================================================================
+    function Projects({ projects }) {
+      return (
+        <section id="projects" className="section-container">
+          <div className="section-header">
+            <h2 className="section-heading">Featured Projects</h2>
+            <span className="section-tag">Hands-on Work</span>
+          </div>
+          <div className="projects-grid">
+            {projects.map((p) => (
+              <article key={p.id} className="project-card">
+                <div className="project-card-header">
+                  <h3 className="project-card-title">{p.title}</h3>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <a href={p.github} target="_blank" rel="noreferrer" className="card-link-btn">Code ↗</a>
+                    <a href={p.live} target="_blank" rel="noreferrer" className="card-link-btn highlight">Demo ↗</a>
+                  </div>
+                </div>
+                <p className="project-card-desc">{p.description}</p>
+                <div className="project-card-tags">
+                  {p.tags.map((t, idx) => (
+                    <span key={idx} className="project-tag-pill">{t}</span>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    // =========================================================================
+    // 4. REUSABLE COMPONENT: Footer
+    // =========================================================================
+    function Footer({ student }) {
+      const [copied, setCopied] = useState(false);
+      const currentYear = new Date().getFullYear();
+
+      const handleCopyEmail = () => {
+        navigator.clipboard.writeText(student.email).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2500);
+        });
+      };
+
+      return (
+        <footer id="contact" className="footer-container">
+          <div className="contact-card">
+            <h3 className="contact-title">Let's Connect</h3>
+            <p className="contact-subtitle">
+              Interested in discussing internship opportunities or engineering collaborations?
+            </p>
+            <div className="contact-buttons-row">
+              <a href={`mailto:${student.email}`} className="btn btn-primary">
+                Send an Email
+              </a>
+              <button onClick={handleCopyEmail} className="btn btn-secondary">
+                {copied ? 'Copied to Clipboard! ✓' : 'Copy Email Address'}
+              </button>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p>
+              &copy; {currentYear} {student.name} &bull; {student.degree} ({student.semester})
+            </p>
+            <p className="footer-subtext">
+              Built with React &amp; Component Architecture (Header, About, Skills, Projects, Footer).
+            </p>
+          </div>
+        </footer>
+      );
+    }
+
+    // =========================================================================
+    // MAIN APP COMPONENT: Single-page layout composition
+    // =========================================================================
+    function App() {
+      const [theme, setTheme] = useState('light');
+
+      useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+      }, [theme]);
+
+      const toggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+      };
+
+      return (
+        <div className="portfolio-app">
+          {/* Lab banner */}
+          <div className="lab-banner">
+            <div>
+              <span className="lab-badge">React Lab Assignment</span>
+              <strong style={{ marginLeft: '0.5rem' }}>Introduction to React &amp; Component Architecture</strong>
+            </div>
+            <span>4 Reusable Components: Header, About, Skills, Footer</span>
+          </div>
+
+          {/* 1. Reusable Header */}
+          <Header
+            name={portfolioData.student.name}
+            statusText={portfolioData.student.statusText}
+            navLinks={portfolioData.navLinks}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+          />
+
+          <main>
+            {/* 2. Reusable About */}
+            <About student={portfolioData.student} />
+
+            {/* 3. Reusable Skills */}
+            <Skills categories={portfolioData.skillCategories} />
+
+            {/* Bonus. Reusable Projects */}
+            <Projects projects={portfolioData.projects} />
+          </main>
+
+          {/* 4. Reusable Footer */}
+          <Footer student={portfolioData.student} />
+        </div>
+      );
+    }
+
+    // Render the App into the root DOM node
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

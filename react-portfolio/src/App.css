@@ -1,0 +1,676 @@
+/* ==========================================================================
+   REACT STUDENT PORTFOLIO - CSS DESIGN SYSTEM (Practical 1, 2, 3 & 4)
+   ========================================================================== */
+
+:root {
+  --bg-primary: #fafafa;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f4f4f5;
+  --border-color: #e4e4e7;
+  --border-hover: #d4d4d8;
+
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+
+  --accent-color: #2563eb;
+  --accent-subtle: #eff6ff;
+  --accent-hover: #1d4ed8;
+
+  --badge-bg: #ecfdf5;
+  --badge-text: #065f46;
+  --badge-border: #a7f3d0;
+  --badge-dot: #10b981;
+
+  --error-color: #dc2626;
+  --error-bg: #fef2f2;
+  --error-border: #fecaca;
+
+  --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --transition: 0.2s ease;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #09090b;
+  --bg-surface: #121215;
+  --bg-subtle: #1c1c21;
+  --border-color: #27272a;
+  --border-hover: #3f3f46;
+
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --accent-color: #3b82f6;
+  --accent-subtle: rgba(59, 130, 246, 0.12);
+  --accent-hover: #60a5fa;
+
+  --badge-bg: rgba(16, 185, 129, 0.1);
+  --badge-text: #34d399;
+  --badge-border: rgba(16, 185, 129, 0.25);
+
+  --error-color: #f87171;
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --error-border: rgba(239, 68, 68, 0.25);
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.portfolio-app {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3.5rem 1.5rem;
+}
+
+/* Header & Nav */
+.header-container {
+  padding: 2.25rem 0 1.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: -0.03em;
+}
+
+.brand-logo span {
+  color: var(--accent-color);
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nav-item {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.865rem;
+  font-weight: 500;
+  padding: 0.35rem 0.55rem;
+  border-radius: 6px;
+  transition: all var(--transition);
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-subtle);
+}
+
+.nav-item.active {
+  color: var(--accent-color);
+  background-color: var(--accent-subtle);
+  font-weight: 600;
+}
+
+.theme-toggle-btn {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-left: 0.25rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  border: 1px solid var(--badge-border);
+  font-size: 0.775rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-top: 1.25rem;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--badge-dot);
+}
+
+/* Sections */
+.section-container {
+  padding: 2.25rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.section-heading {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.page-subtitle {
+  font-size: 0.885rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+.section-tag {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+/* Common Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1.15rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+  border: 1px solid transparent;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.785rem;
+}
+
+.btn-primary {
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-hover);
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 1.15rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.825rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.required {
+  color: var(--error-color);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: var(--bg-surface);
+}
+
+.form-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.input-error {
+  border-color: var(--error-color);
+  background-color: var(--error-bg);
+}
+
+.error-message {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--error-color);
+  margin-top: 0.3rem;
+}
+
+/* ==========================================================================
+   PRACTICAL 4: TASK MANAGER REST API & MIDDLEWARE STYLES
+   ========================================================================== */
+
+/* Pipeline Flow Banner */
+.pipeline-flow-banner {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.785rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.flow-badge {
+  background: var(--accent-color);
+  color: #fff;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.72rem;
+  margin-right: 0.25rem;
+}
+
+.flow-step {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+/* Task Manager 2-Column Grid */
+.task-manager-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.task-form-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.35rem;
+}
+
+.panel-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.tasks-display-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.35rem;
+}
+
+.tasks-panel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.task-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.task-card-item {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all var(--transition);
+}
+
+.task-card-item:hover {
+  border-color: var(--border-hover);
+}
+
+.task-header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.4rem;
+  gap: 0.5rem;
+}
+
+.task-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-id-badge {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.task-item-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.task-badges-row {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.priority-badge {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.priority-high {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error-color);
+}
+
+.priority-medium {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+
+.priority-low {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent-color);
+}
+
+.status-badge-pill {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.status-pending {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.status-in-progress {
+  background: var(--accent-subtle);
+  color: var(--accent-color);
+}
+
+.status-completed {
+  background: var(--badge-bg);
+  color: var(--badge-text);
+}
+
+.task-item-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.task-card-actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.delete-btn {
+  color: var(--error-color);
+}
+
+.delete-btn:hover {
+  background-color: var(--error-bg);
+}
+
+/* Middleware Terminal Logger */
+.middleware-logger-terminal {
+  background: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.terminal-header {
+  background: #18181b;
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-bottom: 1px solid #27272a;
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: #ef4444; }
+.terminal-dot.yellow { background: #f59e0b; }
+.terminal-dot.green { background: #10b981; }
+
+.terminal-title {
+  font-size: 0.75rem;
+  color: #a1a1aa;
+  margin-left: 0.35rem;
+}
+
+.terminal-body {
+  padding: 0.85rem 1rem;
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 0.775rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.terminal-log-line {
+  line-height: 1.5;
+}
+
+.terminal-log-line.log-success { color: #34d399; }
+.terminal-log-line.log-info { color: #60a5fa; }
+.terminal-log-line.log-warn { color: #fbbf24; }
+.terminal-log-line.log-error { color: #f87171; }
+
+/* Mobile Responsive */
+@media (max-width: 720px) {
+  .task-manager-grid { grid-template-columns: 1fr; }
+  .nav-menu { gap: 0.25rem; }
+  .nav-item { font-size: 0.785rem; padding: 0.2rem 0.4rem; }
+}
+
+/* ==========================================================================
+   PRACTICAL 5 — MongoDB Integration with Mongoose
+   ========================================================================== */
+
+/* Schema Panel */
+.schema-panel {
+  background: var(--bg-surface);
+  border: 1px solid #2d6a4f;
+  border-left: 3px solid #4DB33D;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+}
+
+.schema-panel-title {
+  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.schema-table-wrap { overflow-x: auto; }
+
+.schema-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.schema-table th {
+  text-align: left;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-subtle);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.schema-table td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.schema-table tr:last-child td { border-bottom: none; }
+
+.field-code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #4DB33D;
+  background: rgba(77, 179, 61, 0.08);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+.type-badge {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  background: var(--accent-subtle);
+  color: var(--accent-color);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  white-space: nowrap;
+}
+
+/* MongoDB ObjectId Badge */
+.task-id-badge.mongo-id {
+  font-family: var(--font-mono);
+  background: rgba(77, 179, 61, 0.12);
+  color: #4DB33D;
+  border-color: rgba(77, 179, 61, 0.3);
+  font-size: 0.67rem;
+}
+
+/* isCompleted badge */
+.completed-badge {
+  font-size: 0.68rem;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
+  padding: 0.1rem 0.4rem;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .completed-badge {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+/* Tags Row */
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.35rem 0;
+}
+
+.tag-pill {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.1rem 0.4rem;
+  color: var(--text-secondary);
+}
+
+/* Meta row (dueDate, timestamps) */
+.task-meta-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0.3rem 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.meta-item { display: flex; align-items: center; gap: 0.25rem; }
+

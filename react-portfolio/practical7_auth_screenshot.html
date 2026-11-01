@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #09030e; color: #fdf4ff; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; padding: 24px; }
+    .hdr { background: #14071d; border-bottom: 1px solid #3b1853; padding: 14px 24px; display: flex; align-items: center; gap: 12px; margin: -24px -24px 20px; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: #ec4899; }
+    .badge { background: #ec4899; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-left: auto; }
+
+    .sec-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .sec-title { font-size: 1.55rem; font-weight: 800; }
+    .sec-sub { color: #d8b4fe; font-size: 0.83rem; margin-top: 4px; }
+    .status-badge { background: rgba(236,72,153,0.15); border: 1px solid #ec4899; color: #f472b6; font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+
+    .pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      background: #1c0628; border: 1px solid #581c87; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 16px; font-size: 0.74rem; }
+    .pipe-badge { background: #ec4899; color: #fff; font-weight: 700; padding: 2px 8px; border-radius: 5px; font-size: 0.68rem; }
+    .pipe-step { color: #f0abfc; font-family: monospace; }
+
+    .grid { display: grid; grid-template-columns: 350px 1fr; gap: 16px; margin-bottom: 16px; }
+
+    .panel { background: #14071d; border: 1px solid #3b1853; border-radius: 10px; padding: 16px; }
+    .panel-title { font-size: 0.8rem; font-family: monospace; font-weight: 700; color: #f472b6; margin-bottom: 12px; }
+
+    .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+    .tab { background: #210c30; border: 1px solid #3b1853; color: #e9d5ff; border-radius: 6px; padding: 5px 12px; font-size: 0.72rem; }
+    .tab.active { background: #ec4899; color: #fff; border-color: #ec4899; font-weight: 700; }
+
+    .form-group { margin-bottom: 10px; }
+    label { font-size: 0.72rem; font-weight: 600; color: #e9d5ff; display: block; margin-bottom: 4px; }
+    .field { background: #210c30; border: 1px solid #3b1853; border-radius: 6px; padding: 7px 10px; font-size: 0.78rem; color: #e9d5ff; width: 100%; }
+    .btn-submit { background: #ec4899; color: #fff; border: none; border-radius: 7px; padding: 9px; font-size: 0.8rem; font-weight: 700; width: 100%; margin-top: 4px; }
+
+    .err-box { background: #450a0a; border: 1px solid #991b1b; border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; font-size: 0.72rem; color: #fca5a5; }
+    .jwt-box { background: #210c30; border: 1px solid #3b1853; border-radius: 8px; padding: 12px; margin-top: 14px; }
+    .jwt-hdr { font-size: 0.72rem; font-weight: 700; color: #f472b6; margin-bottom: 4px; }
+    .jwt-token { font-family: monospace; font-size: 0.67rem; color: #f0abfc; word-break: break-all; }
+
+    .card-list { display: flex; flex-direction: column; gap: 10px; }
+    .card { background: #210c30; border: 1px solid #3b1853; border-radius: 8px; padding: 12px 14px; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .badge-lock { font-family: monospace; font-size: 0.63rem; background: rgba(236,72,153,0.15); color: #ec4899; border: 1px solid #db2777; border-radius: 4px; padding: 1px 6px; }
+    .card-title { font-size: 0.84rem; font-weight: 700; margin-top: 3px; }
+    .card-desc { font-size: 0.74rem; color: #d8b4fe; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="hdr">
+    <div class="logo">R<span>.</span></div>
+    <div style="color:#c084fc;font-size:0.78rem">Rishi | 5th Sem IT B.Tech Portfolio</div>
+    <div class="badge">🔒 Practical 7 — JWT Auth &amp; Middleware</div>
+  </div>
+
+  <div class="sec-hdr">
+    <div>
+      <div class="sec-title">Authentication &amp; Input Validation Middleware</div>
+      <div class="sec-sub">Server-side payload verification, password hashing, and JWT token issuance on Express pipeline</div>
+    </div>
+    <div class="status-badge">🔒 JWT Token Active (HS256)</div>
+  </div>
+
+  <div class="pipeline">
+    <span class="pipe-badge">Middleware Chain</span>
+    <span class="pipe-step">1. validateRegisterInput</span> →
+    <span class="pipe-step">2. Pre-save Hash</span> →
+    <span class="pipe-step">3. generateToken (JWT)</span> →
+    <span class="pipe-step">4. Authorization: Bearer &lt;token&gt;</span> →
+    <span class="pipe-step">5. protect Middleware</span>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="tabs">
+        <span class="tab active">Sign In (Login)</span>
+        <span class="tab">Register New User</span>
+      </div>
+      <div class="panel-title">POST /api/auth/login</div>
+
+      <div class="form-group">
+        <label>Email Address <span style="color:#f87171">*</span></label>
+        <div class="field">rishi.student@btech.ac.in</div>
+      </div>
+      <div class="form-group">
+        <label>Password <span style="color:#f87171">*</span></label>
+        <div class="field">••••••••••••••</div>
+      </div>
+
+      <div class="err-box">
+        <strong>⚠️ Input Validation Middleware (validateLoginInput):</strong>
+        <div>• Request format verified: RFC 5322 compliant email regex</div>
+        <div>• Minimum password constraint satisfied (>= 6 characters)</div>
+      </div>
+
+      <button class="btn-submit">🔐 Authenticate &amp; Receive JWT</button>
+
+      <div class="jwt-box">
+        <div class="jwt-hdr">Signed Bearer Token (24h Validity):</div>
+        <div class="jwt-token">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MjZmMWEyYzRlM2IxZDBlOGY5YzAwMSIsIm5hbWUiOiJSaXNoaSBTdHVkZW50IiwiZW1haWwiOiJyaXNoaS5zdHVkZW50QGJ0ZWNoLmFjLmluIiwicm9sZSI6InN0dWRlbnQifQ.sig_demo</div>
+        <div style="font-size:0.67rem;color:#c084fc;margin-top:6px;border-top:1px solid #3b1853;padding-top:4px;">
+          <strong>Decoded Claims:</strong> id: 6726f1a2... | role: student | alg: HS256
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🔒 Protected Route Verification: GET /api/tasks</div>
+      <div style="background:#2e1065;border:1px solid #7c3aed;border-radius:6px;padding:8px 12px;font-size:0.74rem;color:#ddd6fe;margin-bottom:12px;">
+        Incoming requests pass through <code>protect</code> middleware. The token in the <code>Authorization</code> header is parsed, validated against <code>JWT_SECRET</code>, and decoded into <code>req.user</code>.
+      </div>
+
+      <div class="card-list">
+        <div class="card">
+          <div class="card-top">
+            <div>
+              <span class="badge-lock">🔑 Protected</span>
+              <div class="card-title">Complete JWT Middleware Implementation</div>
+            </div>
+            <span style="font-size:0.65rem;background:rgba(239,68,68,0.15);color:#f87171;padding:2px 6px;border-radius:4px">High</span>
+          </div>
+          <div class="card-desc">Validate authorization headers and reject expired or missing tokens.</div>
+          <div style="font-size:0.67rem;color:#a855f7">Authorized User: <code>rishi.student@btech.ac.in</code></div>
+        </div>
+
+        <div class="card">
+          <div class="card-top">
+            <div>
+              <span class="badge-lock">🔑 Protected</span>
+              <div class="card-title">Audit Server-Side Input Validation Regex</div>
+            </div>
+            <span style="font-size:0.65rem;background:rgba(52,211,153,0.15);color:#34d399;padding:2px 6px;border-radius:4px">Completed</span>
+          </div>
+          <div class="card-desc">Ensure RFC-compliant email checks and strong password rules on registration.</div>
+          <div style="font-size:0.67rem;color:#a855f7">Authorized User: <code>rishi.student@btech.ac.in</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

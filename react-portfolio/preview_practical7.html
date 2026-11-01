@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical 7 — Authentication & Middleware Pipeline (JWT & Validation)</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #09030e; --surface: #14071d; --subtle: #210c30;
+      --border: #3b1853; --text: #fdf4ff; --muted: #a855f7; --secondary: #e9d5ff;
+      --accent: #ec4899; --accent-sub: rgba(236,72,153,0.15);
+      --green: #10b981; --error: #f87171; --warn: #fbbf24;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14.5px; }
+    .hdr { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.8rem 1.6rem;
+      display: flex; align-items: center; gap: 1rem; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: var(--accent); }
+    .badge-p7 { background: #ec4899; color: #fff; font-size: 0.72rem; font-weight: 700;
+      padding: 0.25rem 0.75rem; border-radius: 999px; margin-left: auto; }
+    .page { max-width: 1160px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+
+    .sec-hdr { display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .sec-title { font-size: 1.6rem; font-weight: 800; }
+    .sec-sub { color: #d8b4fe; font-size: 0.875rem; margin-top: 0.25rem; }
+    .status-conn { background: rgba(236,72,153,0.15); border: 1px solid #ec4899; color: #f472b6;
+      font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 999px; }
+
+    .pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem;
+      background: #1c0628; border: 1px solid #581c87; border-radius: 8px;
+      padding: 0.65rem 1.1rem; margin-bottom: 1.25rem; font-size: 0.78rem; }
+    .pipe-badge { background: #ec4899; color: #fff; font-weight: 700;
+      padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.7rem; }
+    .pipe-step { color: #f0abfc; font-family: var(--mono); }
+
+    .grid { display: grid; grid-template-columns: 360px 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
+    @media(max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.15rem; }
+    .panel-title { font-size: 0.82rem; font-family: var(--mono); font-weight: 700;
+      color: #f472b6; margin-bottom: 0.9rem; }
+
+    .tabs { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+    .tab-btn { background: var(--subtle); border: 1px solid var(--border); color: #e9d5ff; border-radius: 6px; padding: 0.35rem 0.75rem; font-size: 0.75rem; cursor: pointer; }
+    .tab-btn.active { background: #ec4899; color: #fff; border-color: #ec4899; font-weight: 700; }
+
+    .form-group { margin-bottom: 0.75rem; }
+    label { font-size: 0.75rem; font-weight: 600; color: #e9d5ff; display: block; margin-bottom: 0.25rem; }
+    label small { font-weight: 400; color: #c084fc; }
+    input {
+      width: 100%; background: var(--subtle); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.82rem;
+      color: var(--text); font-family: var(--sans); outline: none; }
+    input:focus { border-color: #ec4899; }
+    .err-box { background: #450a0a; border: 1px solid #991b1b; border-radius: 6px; padding: 0.6rem; margin-bottom: 0.8rem; font-size: 0.72rem; color: #fca5a5; }
+    .ok-box { background: #064e3b; border: 1px solid #059669; border-radius: 6px; padding: 0.5rem; margin-bottom: 0.8rem; font-size: 0.75rem; color: #34d399; }
+
+    .btn { border: none; border-radius: 7px; cursor: pointer; font-family: var(--sans); font-weight: 600; }
+    .btn-primary { background: #ec4899; color: #fff; padding: 0.6rem 1rem; font-size: 0.82rem; width: 100%; }
+    .btn-secondary { background: var(--subtle); border: 1px solid var(--border); color: #e9d5ff;
+      padding: 0.32rem 0.65rem; font-size: 0.74rem; }
+
+    .jwt-box { background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 0.65rem; margin-top: 1rem; }
+    .jwt-hdr { font-size: 0.72rem; font-weight: 700; color: #f472b6; margin-bottom: 0.3rem; }
+    .jwt-token { font-family: var(--mono); font-size: 0.68rem; color: #f0abfc; word-break: break-all; }
+
+    .cards-list { display: flex; flex-direction: column; gap: 0.65rem; }
+    .card { background: var(--subtle); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1rem; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem; }
+    .badge-lock { font-family: var(--mono); font-size: 0.65rem; background: rgba(236,72,153,0.15); color: #ec4899; border: 1px solid #db2777; border-radius: 4px; padding: 1px 6px; }
+    .card-title { font-size: 0.88rem; font-weight: 700; margin-top: 0.25rem; }
+    .card-desc { font-size: 0.8rem; color: #d8b4fe; margin-bottom: 0.4rem; }
+
+    .terminal { border: 1px solid #a21caf; border-radius: 10px; overflow: hidden; font-family: var(--mono); }
+    .term-hdr { background: #3b0764; border-bottom: 1px solid #a21caf;
+      padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.4rem; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .dr { background: #ff5f57; } .dy { background: #ffbd2e; } .dg { background: #28c840; }
+    .term-lbl { font-size: 0.77rem; color: #f0abfc; margin-left: 0.5rem; font-weight: 600; }
+    .term-body { background: #130420; padding: 0.8rem 1rem; max-height: 180px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.73rem; }
+    .log-ok { color: #34d399; } .log-info { color: #60a5fa; } .log-err { color: #f87171; } .log-warn { color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    function App() {
+      const [tab, setTab] = useState('login');
+      const [email, setEmail] = useState('rishi@btech.ac.in');
+      const [password, setPassword] = useState('Pass1234');
+      const [name, setName] = useState('');
+      const [errors, setErrors] = useState([]);
+      const [msg, setMsg] = useState('');
+      const [token, setToken] = useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MjZmMWEyYzRlM2IxZDBlOGY5YzAwMSIsIm5hbWUiOiJSaXNoaSBTdHVkZW50IiwiZW1haWwiOiJyaXNoaUBidGVjaC5hYy5pbiIsInJvbGUiOiJzdHVkZW50IiwiZXhwIjoxNzg0ODg2NDAwfQ.v_8nQ2K_sample_demo_key');
+      const [logs, setLogs] = useState([
+        { id: 1, type: 'log-ok', text: '[22:05:00] POST /api/auth/login -> 200 OK (JWT Token generated & signed)' },
+        { id: 2, type: 'log-info', text: '[22:05:01] GET /api/tasks -> Bearer Token verified -> Attached req.user -> 200 OK' }
+      ]);
+
+      const log = (text, type = 'log-ok') => {
+        const ts = new Date().toLocaleTimeString();
+        setLogs(p => [{ id: Date.now(), type, text: `[${ts}] ${text}` }, ...p.slice(0, 7)]);
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const errs = [];
+        if (tab === 'register' && (!name.trim() || name.trim().length < 2)) {
+          errs.push('Name is required (minimum 2 characters).');
+        }
+        if (!email.includes('@') || !email.includes('.')) {
+          errs.push('Please enter a valid email address.');
+        }
+        if (!password || password.length < 6) {
+          errs.push('Password must be at least 6 characters.');
+        }
+
+        if (errs.length > 0) {
+          setErrors(errs);
+          log(`${tab === 'login' ? 'POST /api/auth/login' : 'POST /api/auth/register'} -> 400 Bad Request (Validation failed)`, 'log-err');
+          return;
+        }
+
+        setErrors([]);
+        const newToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ id: '6726f1a2c4e3b1d0e8f9c001', name: name || 'Rishi', email, role: 'student', exp: Math.floor(Date.now()/1000)+86400 }))}.sig_${Date.now()}`;
+        setToken(newToken);
+        setMsg(`Authenticated as ${email}`);
+        log(`${tab === 'login' ? 'POST /api/auth/login' : 'POST /api/auth/register'} -> 200 OK (JWT Issued)`, 'log-ok');
+      };
+
+      return (
+        <div>
+          <div className="hdr">
+            <div className="logo">R<span>.</span></div>
+            <div style={{color:'#c084fc',fontSize:'0.8rem'}}>Rishi | 5th Sem IT B.Tech Portfolio</div>
+            <div className="badge-p7">🔒 Practical 7 — JWT Auth &amp; Middleware</div>
+          </div>
+
+          <div className="page">
+            <div className="sec-hdr">
+              <div>
+                <div className="sec-title">Authentication &amp; Middleware Pipeline</div>
+                <div className="sec-sub">Practical 7 — JWT token issuance, Authorization: Bearer verification, and input validation.</div>
+              </div>
+              <div className="status-conn">🔒 JWT Pipeline Active</div>
+            </div>
+
+            <div className="pipeline">
+              <span className="pipe-badge">Middleware Chain</span>
+              <span className="pipe-step">1. validateInput</span> →
+              <span className="pipe-step">2. Hash Password</span> →
+              <span className="pipe-step">3. Generate JWT</span> →
+              <span className="pipe-step">4. protect Middleware (Bearer)</span> →
+              <span className="pipe-step">5. Protected Controller</span>
+            </div>
+
+            <div className="grid">
+              <div className="panel">
+                <div className="tabs">
+                  <button className={`tab-btn ${tab==='login'?'active':''}`} onClick={()=>{setTab('login');setErrors([]);setMsg('');}}>Sign In (Login)</button>
+                  <button className={`tab-btn ${tab==='register'?'active':''}`} onClick={()=>{setTab('register');setErrors([]);setMsg('');}}>Register New User</button>
+                </div>
+
+                <div className="panel-title">{tab==='login'?'POST /api/auth/login':'POST /api/auth/register'}</div>
+
+                <form onSubmit={handleSubmit}>
+                  {tab === 'register' && (
+                    <div className="form-group">
+                      <label>Full Name <span style={{color:'#f87171'}}>*</span></label>
+                      <input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Rishi Kumar" />
+                    </div>
+                  )}
+                  <div className="form-group">
+                    <label>Email Address <span style={{color:'#f87171'}}>*</span></label>
+                    <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="student@btech.ac.in" />
+                  </div>
+                  <div className="form-group">
+                    <label>Password <span style={{color:'#f87171'}}>*</span> <small>(min 6 chars)</small></label>
+                    <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" />
+                  </div>
+
+                  {errors.length > 0 && (
+                    <div className="err-box">
+                      <strong style={{display:'block',marginBottom:'3px'}}>⚠️ Input Validation Middleware:</strong>
+                      {errors.map((er, i) => <div key={i}>• {er}</div>)}
+                    </div>
+                  )}
+
+                  {msg && <div className="ok-box">✔ {msg}</div>}
+
+                  <button type="submit" className="btn btn-primary">{tab==='login'?'🔐 Authenticate & Receive JWT':'📝 Register & Generate Token'}</button>
+                </form>
+
+                <div className="jwt-box">
+                  <div className="jwt-hdr">Active Bearer Token:</div>
+                  <div className="jwt-token">Bearer {token.slice(0, 48)}...</div>
+                  <div style={{fontSize:'0.68rem',color:'#c084fc',marginTop:'6px',paddingTop:'4px',borderTop:'1px solid var(--border)'}}>
+                    <strong>Claims:</strong> id: 6726f1a2... | role: student | alg: HS256
+                  </div>
+                </div>
+              </div>
+
+              <div className="panel">
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.75rem'}}>
+                  <div className="panel-title" style={{marginBottom:0}}>🔒 Protected Tasks: GET /api/tasks</div>
+                  <div style={{display:'flex',gap:'0.3rem'}}>
+                    <button className="btn btn-secondary" onClick={()=>log('GET /api/tasks [Authorization: Bearer ...] -> protect: 200 OK','log-ok')}>✔ Test Token (200)</button>
+                    <button className="btn btn-secondary" style={{color:'#f87171'}} onClick={()=>log('GET /api/tasks (no token) -> protect: 401 Unauthorized','log-err')}>⚠️ Test No Token (401)</button>
+                  </div>
+                </div>
+
+                <div style={{background:'#2e1065',border:'1px solid #7c3aed',borderRadius:'6px',padding:'0.6rem 0.8rem',fontSize:'0.75rem',color:'#ddd6fe',marginBottom:'0.9rem'}}>
+                  All requests to <code>/api/tasks</code> require a valid <code>Authorization: Bearer &lt;JWT&gt;</code> header verified by the <code>protect</code> middleware before reaching controllers.
+                </div>
+
+                <div className="cards-list">
+                  <div className="card">
+                    <div className="card-top">
+                      <div>
+                        <span className="badge-lock">🔑 Protected</span>
+                        <div className="card-title">Complete JWT Middleware Implementation</div>
+                      </div>
+                      <span style={{fontSize:'0.65rem',background:'rgba(239,68,68,0.15)',color:'#f87171',padding:'2px 6px',borderRadius:'4px'}}>High</span>
+                    </div>
+                    <div className="card-desc">Validate authorization headers and reject expired or missing tokens.</div>
+                    <div style={{fontSize:'0.68rem',color:'#a855f7'}}>Assigned User: <code>rishi@btech.ac.in</code></div>
+                  </div>
+
+                  <div className="card">
+                    <div className="card-top">
+                      <div>
+                        <span className="badge-lock">🔑 Protected</span>
+                        <div className="card-title">Audit Server-Side Input Validation Regex</div>
+                      </div>
+                      <span style={{fontSize:'0.65rem',background:'rgba(52,211,153,0.15)',color:'#34d399',padding:'2px 6px',borderRadius:'4px'}}>Completed</span>
+                    </div>
+                    <div className="card-desc">Ensure RFC-compliant email checks and strong password rules on registration.</div>
+                    <div style={{fontSize:'0.68rem',color:'#a855f7'}}>Assigned User: <code>rishi@btech.ac.in</code></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="terminal">
+              <div className="term-hdr">
+                <span className="dot dr"/><span className="dot dy"/><span className="dot dg"/>
+                <div className="term-lbl">🛡️ Live Middleware Execution Stream (Validation → JWT Verification → Authorization Pipeline)</div>
+              </div>
+              <div className="term-body">
+                {logs.map(l => (
+                  <div key={l.id} className={l.type}>{l.text}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

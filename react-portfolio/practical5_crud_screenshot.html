@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #09090b; color: #f4f4f5; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; padding: 24px; }
+    .hdr { background: #121215; border-bottom: 1px solid #27272a; padding: 14px 24px; display: flex; align-items: center; gap: 12px; margin: -24px -24px 20px; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: #3b82f6; }
+    .badge { background: #4DB33D; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-left: auto; }
+
+    h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+    .sub { font-size: 0.83rem; color: #a1a1aa; margin-bottom: 18px; }
+
+    /* Main Grid */
+    .main-grid { display: grid; grid-template-columns: 300px 1fr; gap: 14px; margin-bottom: 14px; }
+
+    /* Form Panel */
+    .panel { background: #121215; border: 1px solid #27272a; border-radius: 10px; padding: 14px; }
+    .panel-title { font-size: 0.78rem; font-family: monospace; font-weight: 700; color: #a1a1aa; margin-bottom: 12px; }
+    .form-group { margin-bottom: 10px; }
+    label { font-size: 0.72rem; font-weight: 600; color: #a1a1aa; display: block; margin-bottom: 4px; }
+    .field { background: #1c1c21; border: 1px solid #27272a; border-radius: 6px; padding: 7px 10px; font-size: 0.78rem; color: #71717a; width: 100%; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-create { background: #4DB33D; color: #fff; border: none; border-radius: 7px; padding: 9px; font-size: 0.8rem; font-weight: 700; width: 100%; cursor: pointer; }
+    .diag { margin-top: 12px; padding-top: 12px; border-top: 1px solid #27272a; }
+    .diag-lbl { font-size: 0.67rem; color: #71717a; margin-bottom: 6px; display: block; }
+    .btn-diag { background: #1c1c21; border: 1px solid #27272a; color: #f87171; border-radius: 6px; padding: 6px; font-size: 0.72rem; width: 100%; margin-bottom: 5px; cursor: pointer; }
+    .btn-diag2 { background: #1c1c21; border: 1px solid #27272a; color: #fbbf24; border-radius: 6px; padding: 6px; font-size: 0.72rem; width: 100%; cursor: pointer; }
+
+    /* Filter Pills */
+    .filter-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; }
+    .pill { border: 1px solid #27272a; background: #1c1c21; color: #71717a; border-radius: 999px; padding: 2px 8px; font-size: 0.68rem; cursor: pointer; }
+    .pill.active { background: rgba(77,179,61,0.12); border-color: #4DB33D; color: #4DB33D; }
+
+    /* Task Cards */
+    .cards { display: flex; flex-direction: column; gap: 8px; }
+    .card { background: #1c1c21; border: 1px solid #27272a; border-radius: 8px; padding: 10px 12px; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+    .oid { font-family: monospace; font-size: 0.62rem; background: rgba(77,179,61,0.1); color: #4DB33D; border: 1px solid rgba(77,179,61,0.3); border-radius: 4px; padding: 1px 6px; white-space: nowrap; }
+    .card-title { font-size: 0.82rem; font-weight: 700; margin-top: 3px; }
+    .card-desc { font-size: 0.74rem; color: #a1a1aa; margin-bottom: 5px; }
+    .badges { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+    .pri { font-size: 0.63rem; font-weight: 700; border-radius: 4px; padding: 1px 6px; }
+    .pri-high { background: rgba(239,68,68,0.15); color: #f87171; }
+    .pri-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .sts { font-size: 0.63rem; border-radius: 4px; padding: 1px 6px; font-weight: 600; }
+    .sts-pending { background: rgba(156,163,175,0.15); color: #9ca3af; }
+    .sts-in-progress { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .sts-completed { background: rgba(52,211,153,0.15); color: #34d399; }
+    .done-badge { font-size: 0.62rem; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); border-radius: 999px; padding: 1px 6px; font-weight: 600; }
+    .tags { display: flex; gap: 4px; flex-wrap: wrap; margin: 5px 0; }
+    .tag { font-family: monospace; font-size: 0.62rem; background: #121215; border: 1px solid #27272a; border-radius: 999px; padding: 1px 6px; color: #a1a1aa; }
+    .meta { font-size: 0.65rem; color: #71717a; margin-bottom: 6px; }
+    .card-actions { display: flex; gap: 6px; }
+    .btn-upd { background: #1c1c21; border: 1px solid #27272a; color: #a1a1aa; border-radius: 5px; padding: 4px 10px; font-size: 0.7rem; cursor: pointer; }
+    .btn-del { background: #1c1c21; border: 1px solid #27272a; color: #f87171; border-radius: 5px; padding: 4px 10px; font-size: 0.7rem; cursor: pointer; }
+
+    /* Terminal */
+    .terminal { border: 1px solid #2d6a4f; border-radius: 10px; overflow: hidden; font-family: monospace; }
+    .term-hdr { background: #0d2a1a; border-bottom: 1px solid #2d6a4f; padding: 9px 14px; display: flex; align-items: center; gap: 6px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .dr { background: #ff5f57; } .dy { background: #ffbd2e; } .dg { background: #28c840; }
+    .term-lbl { font-size: 0.75rem; color: #4DB33D; margin-left: 6px; font-weight: 600; }
+    .term-body { background: #071510; padding: 10px 14px; }
+    .log { font-size: 0.72rem; line-height: 1.6; }
+    .log-ok { color: #34d399; } .log-info { color: #60a5fa; } .log-warn { color: #fbbf24; } .log-err { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div class="hdr">
+    <div class="logo">R<span>.</span></div>
+    <div style="color:#71717a;font-size:0.78rem">Rishi | 5th Sem IT B.Tech Portfolio</div>
+    <div class="badge">🍃 Practical 5 — MongoDB + Mongoose</div>
+  </div>
+
+  <h1>MongoDB CRUD Operations with Mongoose</h1>
+  <div class="sub">Task.create() / Task.find() / Task.findByIdAndUpdate() / Task.findByIdAndDelete() — with runValidators &amp; error handling</div>
+
+  <div class="main-grid">
+    <!-- Form -->
+    <div class="panel">
+      <div class="panel-title">Task.create() — POST /api/tasks</div>
+      <div class="form-group"><label>Title <span style="color:#f87171">*</span> (min 3 chars)</label><div class="field">Setup MongoDB Atlas Cluster</div></div>
+      <div class="form-group"><label>Description (maxlength 500)</label><div class="field">Create free-tier cluster, whitelist IP, get connection string.</div></div>
+      <div class="two-col">
+        <div class="form-group"><label>Priority</label><div class="field">High ▾</div></div>
+        <div class="form-group"><label>Due Date</label><div class="field">2026-11-15</div></div>
+      </div>
+      <div class="form-group"><label>Tags (comma-separated)</label><div class="field">mongodb, atlas, cloud</div></div>
+      <button class="btn-create">➕ Task.create() — Insert Document</button>
+      <div class="diag">
+        <span class="diag-lbl">Mongoose Error Diagnostics:</span>
+        <button class="btn-diag">⚠️ Simulate ValidationError (empty title)</button>
+        <button class="btn-diag2">🔑 Simulate CastError (invalid ObjectId)</button>
+      </div>
+    </div>
+
+    <!-- Task Documents -->
+    <div class="panel">
+      <div class="filter-bar">
+        <div class="panel-title" style="margin-bottom:0">Task.find() — 3 MongoDB Documents</div>
+        <div class="pills">
+          <span class="pill active">All</span>
+          <span class="pill">Pending</span>
+          <span class="pill">In Progress</span>
+          <span class="pill">Completed</span>
+        </div>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-top">
+            <div><div class="oid">🍃 6726f1a2…</div><div class="card-title">Complete Practical 5 Mongoose Lab Report</div></div>
+            <div class="badges"><span class="pri pri-high">High</span><span class="sts sts-in-progress">In Progress</span></div>
+          </div>
+          <div class="card-desc">Connect MongoDB, define schema with validation, test all CRUD via Mongoose.</div>
+          <div class="tags"><span class="tag">#mongodb</span><span class="tag">#mongoose</span><span class="tag">#lab</span></div>
+          <div class="meta">📅 2026-11-10 · isCompleted: false · updatedAt: 2026-11-01 12:30</div>
+          <div class="card-actions"><button class="btn-upd">↻ Update Status</button><button class="btn-del">🗑️ Delete</button></div>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div><div class="oid">🍃 6726f1a2…</div><div class="card-title">Implement JWT Authentication Middleware</div></div>
+            <div class="badges"><span class="pri pri-medium">Medium</span><span class="sts sts-pending">Pending</span></div>
+          </div>
+          <div class="card-desc">Add passport-jwt strategy to protect task API routes.</div>
+          <div class="tags"><span class="tag">#security</span><span class="tag">#express</span></div>
+          <div class="meta">dueDate: null · isCompleted: false · updatedAt: 2026-10-30 14:30</div>
+          <div class="card-actions"><button class="btn-upd">↻ Update Status</button><button class="btn-del">🗑️ Delete</button></div>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div><div class="oid">🍃 6726f1a2…</div><div class="card-title">Deploy Express API to Railway</div></div>
+            <div class="badges"><span class="pri pri-high">High</span><span class="sts sts-completed">Completed</span><span class="done-badge">✔ isCompleted</span></div>
+          </div>
+          <div class="card-desc">Set MONGO_URI env, connect Atlas free-tier, run npm start.</div>
+          <div class="tags"><span class="tag">#devops</span><span class="tag">#deployment</span><span class="tag">#mongodb-atlas</span></div>
+          <div class="meta">📅 2026-10-28 · isCompleted: true · updatedAt: 2026-10-28 16:00</div>
+          <div class="card-actions"><button class="btn-upd">↻ Update Status</button><button class="btn-del">🗑️ Delete</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="terminal">
+    <div class="term-hdr">
+      <span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span>
+      <div class="term-lbl">🍃 Mongoose Query Log — mongodb://127.0.0.1:27017/task_manager_db</div>
+    </div>
+    <div class="term-body">
+      <div class="log log-ok">[2026-11-01T10:00:00.000Z] mongoose.connect("mongodb://127.0.0.1:27017/task_manager_db") → connected ✔</div>
+      <div class="log log-info">[2026-11-01T10:00:00.012Z] [Mongoose] Connection readyState: 1 (connected)</div>
+      <div class="log log-ok">[2026-11-01T10:00:01.003Z] Task.find({}) → 3 documents returned from collection "tasks"</div>
+      <div class="log log-ok">[2026-11-01T10:05:23.140Z] Task.create({ title: "Deploy Express API to Railway" }) → _id: 6726f1a2c4e3b1d0e8f9a003 inserted ✔</div>
+      <div class="log log-ok">[2026-11-01T11:12:44.220Z] Task.findByIdAndUpdate("6726f1a2c4e3b1d0e8f9a003", { status: "Completed", isCompleted: true }, { runValidators: true }) → 200 OK</div>
+      <div class="log log-err">[2026-11-01T12:00:00.000Z] Task.create({ title: "" }) → ValidationError: Path `title` is required.</div>
+      <div class="log log-err">[2026-11-01T12:01:00.000Z] Task.findById("not-a-valid-id") → CastError: Cast to ObjectId failed for value "not-a-valid-id"</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #09030e; color: #fdf4ff; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; padding: 24px; }
+    .hdr { background: #14071d; border-bottom: 1px solid #3b1853; padding: 14px 24px; display: flex; align-items: center; gap: 12px; margin: -24px -24px 20px; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: #ec4899; }
+    .badge { background: #ec4899; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-left: auto; }
+
+    h1 { font-size: 1.45rem; font-weight: 800; margin-bottom: 4px; }
+    .sub { font-size: 0.83rem; color: #d8b4fe; margin-bottom: 18px; }
+
+    /* Security Architecture Diagram */
+    .arch-card { background: #14071d; border: 1px solid #3b1853; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .arch-title { font-size: 0.82rem; font-family: monospace; font-weight: 700; color: #f472b6; margin-bottom: 12px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .arch-node { background: #210c30; border: 1px solid #3b1853; border-radius: 8px; padding: 12px; text-align: center; }
+    .node-title { font-weight: 700; font-size: 0.82rem; margin-bottom: 4px; }
+    .node-sub { font-size: 0.69rem; color: #d8b4fe; font-family: monospace; }
+    .node-status { font-size: 0.65rem; color: #34d399; font-weight: 700; margin-top: 4px; }
+
+    /* Terminal Stream */
+    .terminal { border: 1px solid #a21caf; border-radius: 10px; overflow: hidden; font-family: monospace; }
+    .term-hdr { background: #3b0764; border-bottom: 1px solid #a21caf; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .dr { background: #ff5f57; } .dy { background: #ffbd2e; } .dg { background: #28c840; }
+    .term-lbl { font-size: 0.77rem; color: #f0abfc; margin-left: 6px; font-weight: 600; }
+    .term-body { background: #130420; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .log-row { display: flex; gap: 14px; font-size: 0.73rem; line-height: 1.5; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .m-post { color: #f472b6; font-weight: 700; }
+    .m-get { color: #34d399; font-weight: 700; }
+    .st-ok { color: #34d399; font-weight: 700; }
+    .st-err { color: #f87171; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="hdr">
+    <div class="logo">R<span>.</span></div>
+    <div style="color:#c084fc;font-size:0.78rem">Rishi | 5th Sem IT B.Tech Portfolio</div>
+    <div class="badge">🔒 Practical 7 — JWT Auth &amp; Middleware</div>
+  </div>
+
+  <h1>JWT Route Protection &amp; Middleware Pipeline Flow</h1>
+  <div class="sub">Express Request Pipeline: Input Validation Middleware ⇄ Authentication Middleware ⇄ Protected Controllers</div>
+
+  <div class="arch-card">
+    <div class="arch-title">● EXPRESS SECURITY &amp; AUTHENTICATION MIDDLEWARE PIPELINE</div>
+    <div class="arch-flow">
+      <div class="arch-node">
+        <div class="node-title" style="color:#f472b6">1. Request Headers</div>
+        <div class="node-sub">Authorization: Bearer &lt;token&gt;</div>
+        <div class="node-status">HTTP / REST Client</div>
+      </div>
+      <div class="arch-node">
+        <div class="node-title" style="color:#c084fc">2. protect Middleware</div>
+        <div class="node-sub">jwt.verify(token, JWT_SECRET)</div>
+        <div class="node-status">401 if Invalid/Missing</div>
+      </div>
+      <div class="arch-node">
+        <div class="node-title" style="color:#a855f7">3. Context Injection</div>
+        <div class="node-sub">req.user = decodedPayload</div>
+        <div class="node-status">Claims: { id, email, role }</div>
+      </div>
+      <div class="arch-node">
+        <div class="node-title" style="color:#34d399">4. Target Controller</div>
+        <div class="node-sub">Task.find({ user: req.user.id })</div>
+        <div class="node-status">200 OK Authorized</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="term-hdr">
+      <span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span>
+      <div class="term-lbl">🛡️ Live Middleware Execution Stream (Validation → Token Verification → Protected Handlers)</div>
+    </div>
+    <div class="term-body">
+      <div class="log-row">
+        <span style="color:#7e22ce;min-width:65px">22:04:12</span>
+        <span class="m-post" style="min-width:60px">POST</span>
+        <span style="min-width:170px;color:#e9d5ff">/api/auth/register</span>
+        <span class="st-err" style="min-width:60px">[400 BAD]</span>
+        <span style="color:#9333ea">— validateRegisterInput: Rejected malformed email "invalid-email" and short password</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#7e22ce;min-width:65px">22:04:30</span>
+        <span class="m-post" style="min-width:60px">POST</span>
+        <span style="min-width:170px;color:#e9d5ff">/api/auth/register</span>
+        <span class="st-ok" style="min-width:60px">[201 CREATED]</span>
+        <span style="color:#e9d5ff">— User "Rishi Student" saved in MongoDB; JWT issued with 24h validity</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#7e22ce;min-width:65px">22:04:45</span>
+        <span class="m-get" style="min-width:60px">GET</span>
+        <span style="min-width:170px;color:#e9d5ff">/api/tasks</span>
+        <span class="st-err" style="min-width:60px">[401 UNAUTH]</span>
+        <span style="color:#f87171">— protect middleware: Missing Authorization Bearer token header; request aborted</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#7e22ce;min-width:65px">22:05:01</span>
+        <span class="m-get" style="min-width:60px">GET</span>
+        <span style="min-width:170px;color:#e9d5ff">/api/tasks</span>
+        <span class="st-ok" style="min-width:60px">[200 OK]</span>
+        <span style="color:#34d399">— Bearer token verified -> req.user attached -> Scoped tasks returned for user</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#7e22ce;min-width:65px">22:05:15</span>
+        <span class="m-get" style="min-width:60px">GET</span>
+        <span style="min-width:170px;color:#e9d5ff">/api/auth/me</span>
+        <span class="st-ok" style="min-width:60px">[200 OK]</span>
+        <span style="color:#e9d5ff">— Authenticated user profile retrieved for Rishi Student (role: student)</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

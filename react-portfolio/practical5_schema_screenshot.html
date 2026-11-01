@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #09090b; color: #f4f4f5; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; padding: 24px; }
+    .hdr { background: #121215; border-bottom: 1px solid #27272a; padding: 14px 24px; display: flex; align-items: center; gap: 12px; margin: -24px -24px 20px; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: #3b82f6; }
+    .badge { background: #4DB33D; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-left: auto; }
+
+    /* Section Header */
+    .sec-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .sec-title { font-size: 1.55rem; font-weight: 800; }
+    .sec-sub { color: #a1a1aa; font-size: 0.83rem; margin-top: 4px; }
+    .sec-tag { background: #4DB33D; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; white-space: nowrap; }
+
+    /* Pipeline */
+    .pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      background: #0d2a1a; border: 1px solid #2d6a4f; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 14px; font-size: 0.72rem; }
+    .pipe-badge { background: #4DB33D; color: #fff; font-weight: 700; padding: 2px 8px; border-radius: 5px; font-size: 0.67rem; }
+    .pipe-step { color: #86efac; font-family: monospace; }
+
+    /* Schema Panel */
+    .schema-panel { background: #121215; border: 1px solid #2d6a4f; border-left: 3px solid #4DB33D;
+      border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; }
+    .schema-title { font-size: 0.85rem; font-family: monospace; font-weight: 600; color: #a1a1aa; margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+    th { text-align: left; padding: 6px 12px; background: #1c1c21; font-size: 0.66rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; border-bottom: 1px solid #27272a; }
+    td { padding: 7px 12px; border-bottom: 1px solid #27272a; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .f-code { font-family: monospace; font-size: 0.74rem; color: #4DB33D; background: rgba(77,179,61,0.1); padding: 1px 5px; border-radius: 3px; }
+    .f-type { font-size: 0.68rem; font-family: monospace; background: rgba(59,130,246,0.12); color: #60a5fa; border-radius: 4px; padding: 1px 6px; }
+    .f-notes { font-size: 0.7rem; color: #71717a; }
+    .f-def { font-family: monospace; font-size: 0.7rem; color: #a1a1aa; }
+
+    /* Task cards preview */
+    .cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .card { background: #1c1c21; border: 1px solid #27272a; border-radius: 8px; padding: 12px 14px; }
+    .oid { font-family: monospace; font-size: 0.63rem; background: rgba(77,179,61,0.1); color: #4DB33D; border: 1px solid rgba(77,179,61,0.3); border-radius: 4px; padding: 1px 6px; display: inline-block; margin-bottom: 6px; }
+    .card-title { font-size: 0.83rem; font-weight: 700; margin-bottom: 5px; }
+    .card-desc { font-size: 0.74rem; color: #a1a1aa; margin-bottom: 8px; }
+    .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+    .pri { font-size: 0.64rem; font-weight: 700; border-radius: 4px; padding: 1px 6px; }
+    .pri-high { background: rgba(239,68,68,0.15); color: #f87171; }
+    .pri-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .pri-low { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .sts { font-size: 0.64rem; border-radius: 4px; padding: 1px 6px; font-weight: 600; }
+    .sts-pending { background: rgba(156,163,175,0.15); color: #9ca3af; }
+    .sts-in-progress { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .sts-completed { background: rgba(52,211,153,0.15); color: #34d399; }
+    .done-badge { font-size: 0.62rem; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); border-radius: 999px; padding: 1px 6px; font-weight: 600; }
+    .tags { display: flex; gap: 4px; flex-wrap: wrap; margin: 5px 0; }
+    .tag { font-family: monospace; font-size: 0.63rem; background: #121215; border: 1px solid #27272a; border-radius: 999px; padding: 1px 7px; color: #a1a1aa; }
+    .meta { font-size: 0.66rem; color: #71717a; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="hdr">
+    <div class="logo">R<span>.</span></div>
+    <div style="color:#71717a;font-size:0.78rem">Rishi | 5th Sem IT B.Tech Portfolio</div>
+    <div class="badge">🍃 Practical 5 — MongoDB + Mongoose</div>
+  </div>
+
+  <div class="sec-hdr">
+    <div>
+      <div class="sec-title">MongoDB Integration with Mongoose</div>
+      <div class="sec-sub">Practical 5 — Schema design, Mongoose CRUD, ObjectId, field validation &amp; timestamps.</div>
+    </div>
+    <span class="sec-tag">🍃 mongoose@8 + MongoDB 7</span>
+  </div>
+
+  <div class="pipeline">
+    <span class="pipe-badge">Mongoose Pipeline</span>
+    <span class="pipe-step">dotenv.config()</span> →
+    <span class="pipe-step">connectDB()</span> →
+    <span class="pipe-step">mongoose.connect(MONGO_URI)</span> →
+    <span class="pipe-step">Task Schema + Model</span> →
+    <span class="pipe-step">CRUD Operations</span> →
+    <span class="pipe-step">ValidationError / CastError Handler</span>
+  </div>
+
+  <!-- Schema Table -->
+  <div class="schema-panel">
+    <div class="schema-title">● Task Schema — <code>models/Task.js</code></div>
+    <table>
+      <thead>
+        <tr><th>Field</th><th>Type</th><th>Constraints / Notes</th><th>Default</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="f-code">title</span></td><td><span class="f-type">String</span></td><td class="f-notes">required, minlength: 3, maxlength: 100, trim: true</td><td class="f-def">—</td></tr>
+        <tr><td><span class="f-code">description</span></td><td><span class="f-type">String</span></td><td class="f-notes">trim, maxlength: 500</td><td class="f-def">""</td></tr>
+        <tr><td><span class="f-code">status</span></td><td><span class="f-type">String</span></td><td class="f-notes">enum: [Pending, In Progress, Completed]</td><td class="f-def">"Pending"</td></tr>
+        <tr><td><span class="f-code">priority</span></td><td><span class="f-type">String</span></td><td class="f-notes">enum: [Low, Medium, High]</td><td class="f-def">"Medium"</td></tr>
+        <tr><td><span class="f-code">dueDate</span></td><td><span class="f-type">Date</span></td><td class="f-notes">optional Date field</td><td class="f-def">null</td></tr>
+        <tr><td><span class="f-code">isCompleted</span></td><td><span class="f-type">Boolean</span></td><td class="f-notes">pre-save hook synced: status === "Completed"</td><td class="f-def">false</td></tr>
+        <tr><td><span class="f-code">tags</span></td><td><span class="f-type">[String]</span></td><td class="f-notes">array of strings</td><td class="f-def">[]</td></tr>
+        <tr><td><span class="f-code">_id</span></td><td><span class="f-type">ObjectId</span></td><td class="f-notes">auto-generated by MongoDB</td><td class="f-def">auto</td></tr>
+        <tr><td><span class="f-code">createdAt</span></td><td><span class="f-type">Date</span></td><td class="f-notes">timestamps: true (auto)</td><td class="f-def">auto</td></tr>
+        <tr><td><span class="f-code">updatedAt</span></td><td><span class="f-type">Date</span></td><td class="f-notes">timestamps: true (auto, on each save)</td><td class="f-def">auto</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sample Task Documents -->
+  <div style="font-size:0.75rem;color:#71717a;margin-bottom:8px;font-family:monospace;">Task.find({}) → 3 MongoDB documents:</div>
+  <div class="cards-row">
+    <div class="card">
+      <div class="oid">🍃 6726f1a2…</div>
+      <div class="card-title">Complete Practical 5 Mongoose Lab Report</div>
+      <div class="card-desc">Connect MongoDB, define schema with validation, test all CRUD via Mongoose.</div>
+      <div class="badges">
+        <span class="pri pri-high">High</span>
+        <span class="sts sts-in-progress">In Progress</span>
+      </div>
+      <div class="tags"><span class="tag">#mongodb</span><span class="tag">#mongoose</span><span class="tag">#lab</span></div>
+      <div class="meta">📅 2026-11-10 &nbsp;·&nbsp; isCompleted: false &nbsp;·&nbsp; updatedAt: 12:30</div>
+    </div>
+    <div class="card">
+      <div class="oid">🍃 6726f1a2…</div>
+      <div class="card-title">Implement JWT Authentication Middleware</div>
+      <div class="card-desc">Add passport-jwt strategy to protect task API routes.</div>
+      <div class="badges">
+        <span class="pri pri-medium">Medium</span>
+        <span class="sts sts-pending">Pending</span>
+      </div>
+      <div class="tags"><span class="tag">#security</span><span class="tag">#express</span></div>
+      <div class="meta">dueDate: null &nbsp;·&nbsp; isCompleted: false</div>
+    </div>
+    <div class="card">
+      <div class="oid">🍃 6726f1a2…</div>
+      <div class="card-title">Deploy Express API to Railway</div>
+      <div class="card-desc">Set MONGO_URI env, connect Atlas free-tier, run npm start.</div>
+      <div class="badges">
+        <span class="pri pri-high">High</span>
+        <span class="sts sts-completed">Completed</span>
+        <span class="done-badge">✔ isCompleted</span>
+      </div>
+      <div class="tags"><span class="tag">#devops</span><span class="tag">#deployment</span><span class="tag">#mongodb-atlas</span></div>
+      <div class="meta">📅 2026-10-28 &nbsp;·&nbsp; isCompleted: true</div>
+    </div>
+  </div>
+</body>
+</html>

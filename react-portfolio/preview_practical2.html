@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical 2: State Management & Routing in React</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- React 18 & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #fafafa;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f4f4f5;
+      --border-color: #e4e4e7;
+      --border-hover: #d4d4d8;
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --text-muted: #71717a;
+      --accent-color: #2563eb;
+      --accent-subtle: #eff6ff;
+      --badge-bg: #ecfdf5;
+      --badge-text: #065f46;
+      --badge-border: #a7f3d0;
+      --badge-dot: #10b981;
+      --error-color: #ef4444;
+      --error-bg: #fef2f2;
+      --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #09090b;
+      --bg-surface: #121215;
+      --bg-subtle: #1c1c21;
+      --border-color: #27272a;
+      --border-hover: #3f3f46;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-color: #3b82f6;
+      --accent-subtle: rgba(59, 130, 246, 0.12);
+      --badge-bg: rgba(16, 185, 129, 0.1);
+      --badge-text: #34d399;
+      --badge-border: rgba(16, 185, 129, 0.25);
+      --error-color: #f87171;
+      --error-bg: rgba(239, 68, 68, 0.1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    .portfolio-app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3.5rem 1.5rem;
+    }
+
+    .lab-banner {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--accent-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .lab-badge {
+      background: var(--accent-color);
+      color: #fff;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.72rem;
+    }
+
+    /* Header & Nav */
+    .header-container {
+      padding: 1.5rem 0 1.25rem 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+      cursor: pointer;
+    }
+
+    .brand-logo span {
+      color: var(--accent-color);
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--transition);
+    }
+
+    .nav-btn:hover {
+      color: var(--text-primary);
+      background-color: var(--bg-subtle);
+    }
+
+    .nav-btn.active {
+      color: var(--accent-color);
+      background-color: var(--accent-subtle);
+      font-weight: 600;
+      border-color: var(--border-color);
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      margin-left: 0.5rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      border: 1px solid var(--badge-border);
+      font-size: 0.775rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-top: 1rem;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--badge-dot);
+    }
+
+    /* Sections */
+    .section-container {
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .section-heading {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .page-subtitle {
+      font-size: 0.885rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    .section-tag {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Common Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 1.15rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid transparent;
+      transition: all var(--transition);
+    }
+
+    .btn-primary {
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: var(--text-primary);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    /* Hero / About */
+    .hero-greeting {
+      font-size: 2.35rem;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      margin-bottom: 0.4rem;
+    }
+
+    .highlight-text {
+      color: var(--accent-color);
+    }
+
+    .hero-role {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .hero-bio {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 0.925rem;
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+
+    /* Skills */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .skill-category-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .category-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .skills-badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .skill-badge {
+      font-size: 0.775rem;
+      font-family: var(--font-mono);
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Home Redirect */
+    .page-redirect-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      gap: 1rem;
+    }
+
+    /* Projects Page & Filter Controls */
+    .projects-controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+    }
+
+    .filter-pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .filter-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--transition);
+    }
+
+    .filter-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+
+    .filter-btn.active {
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .toggle-details-btn {
+      background: transparent;
+      border: 1px dashed var(--accent-color);
+      color: var(--accent-color);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .results-counter {
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .projects-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .project-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.35rem;
+    }
+
+    .project-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.6rem;
+      gap: 0.5rem;
+    }
+
+    .project-card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .project-category-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--accent-color);
+      background: var(--accent-subtle);
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      margin-top: 0.25rem;
+    }
+
+    .card-link-btn {
+      font-size: 0.775rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      margin-left: 0.4rem;
+    }
+
+    .card-link-btn.highlight {
+      color: var(--accent-color);
+      background-color: var(--accent-subtle);
+      border-color: transparent;
+    }
+
+    .project-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .architecture-box {
+      background: var(--bg-subtle);
+      border-left: 3px solid var(--accent-color);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .architecture-box ul {
+      padding-left: 1.25rem;
+      margin-top: 0.35rem;
+    }
+
+    .project-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .project-tag-pill {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    /* Contact Page Layout */
+    .contact-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 1.5rem;
+    }
+
+    .contact-info-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .info-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .info-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .info-item {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.65rem;
+    }
+
+    .mono-text {
+      font-family: var(--font-mono);
+      color: var(--accent-color);
+    }
+
+    .faq-toggle-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .faq-toggle-btn {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .faq-content-box {
+      padding: 0.85rem 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      background: var(--bg-subtle);
+    }
+
+    .contact-form-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+
+    .form-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.825rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .label-with-counter {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .char-counter {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      background: var(--bg-surface);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .input-error {
+      border-color: var(--error-color);
+      background-color: var(--error-bg);
+    }
+
+    .error-message {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--error-color);
+      margin-top: 0.3rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.65rem;
+      margin-top: 1.5rem;
+    }
+
+    .submission-success-card {
+      text-align: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .success-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      border: 1px solid var(--badge-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 auto 1rem auto;
+    }
+
+    .success-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .success-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .submitted-preview-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.75rem;
+      text-align: left;
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-container {
+      padding-top: 2.5rem;
+      text-align: center;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 680px) {
+      .contact-grid-layout { grid-template-columns: 1fr; }
+      .projects-controls-bar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const studentData = {
+      name: "Rishi",
+      degree: "B.Tech in Information Technology",
+      semester: "5th Semester (3rd Year)",
+      university: "State Technical University",
+      statusText: "5th Sem IT Undergrad • Open for Internships",
+      bio: "Passionate 3rd-year engineering student with a solid foundation in Data Structures, Algorithms, and Full-Stack Web Development. Currently implementing client-side routing and reactive state management in React.",
+      cgpa: "8.4 / 10.0",
+      email: "rishi@example.com",
+      github: "https://github.com/your-username",
+      linkedin: "https://linkedin.com/in/your-username",
+      leetcode: "https://leetcode.com/your-username",
+    };
+
+    const skillCategories = [
+      {
+        title: "Programming Languages",
+        skills: ["C++", "Java", "Python", "JavaScript (ES6+)", "SQL"]
+      },
+      {
+        title: "Web & Frameworks",
+        skills: ["React.js", "React Router", "Node.js", "Express.js", "REST APIs"]
+      },
+      {
+        title: "Databases & Tools",
+        skills: ["PostgreSQL", "MongoDB", "Git & GitHub", "Postman", "Linux"]
+      },
+      {
+        title: "Core CS Coursework",
+        skills: ["Data Structures & Algorithms", "DBMS", "Operating Systems", "Computer Networks"]
+      }
+    ];
+
+    const rawProjects = [
+      {
+        id: 1,
+        title: "CampusHub — IT Resource & Event Portal",
+        category: "Full-Stack",
+        description: "A collaborative portal for IT department students to exchange semester notes, previous question papers, and track hackathons.",
+        tags: ["React", "Node.js", "MongoDB", "Express"],
+        github: "https://github.com/your-username/campushub",
+        live: "https://campushub-demo.vercel.app"
+      },
+      {
+        id: 2,
+        title: "SnipLink — URL Shortener & Analytics",
+        category: "Backend & Systems",
+        description: "High-performance link compressor with click rate analytics, geo-referrer charts, and Redis caching.",
+        tags: ["Node.js", "PostgreSQL", "Redis", "REST API"],
+        github: "https://github.com/your-username/sniplink",
+        live: "https://sniplink-demo.vercel.app"
+      },
+      {
+        id: 3,
+        title: "AlgoVisualizer — Pathfinding & Sorting",
+        category: "Algorithms",
+        description: "Interactive visualizer for Dijkstra, BFS, and sorting algorithms built to reinforce semester exam concepts.",
+        tags: ["JavaScript", "HTML5 Canvas", "Algorithms"],
+        github: "https://github.com/your-username/algovisualizer",
+        live: "https://algovisualizer-demo.vercel.app"
+      }
+    ];
+
+    // =========================================================================
+    // PAGE 1: Home View
+    // =========================================================================
+    function HomeView({ student, onNavigate }) {
+      return (
+        <div>
+          <section className="section-container">
+            <h1 className="hero-greeting">
+              Hi, I'm <span className="highlight-text">{student.name}</span>
+            </h1>
+            <h2 className="hero-role">
+              {student.semester} &bull; {student.degree}
+            </h2>
+            <p className="hero-bio">{student.bio}</p>
+
+            <div className="hero-stats">
+              <div className="stat-card">
+                <span className="stat-label">Institution</span>
+                <span className="stat-value">{student.university}</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Academic Score</span>
+                <span className="stat-value">CGPA {student.cgpa}</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Current Practical</span>
+                <span className="stat-value">State &amp; React Router</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button onClick={() => onNavigate('projects')} className="btn btn-primary">
+                View Projects (Route)
+              </button>
+              <button onClick={() => onNavigate('contact')} className="btn btn-secondary">
+                Contact Form (Route)
+              </button>
+            </div>
+          </section>
+
+          <section className="section-container">
+            <div className="section-header">
+              <h2 className="section-heading">Technical Skills &amp; Coursework</h2>
+              <span className="section-tag">Semester V IT Stack</span>
+            </div>
+            <div className="skills-grid">
+              {skillCategories.map((cat, idx) => (
+                <div key={idx} className="skill-category-card">
+                  <h3 className="category-title">{cat.title}</h3>
+                  <div className="skills-badge-list">
+                    {cat.skills.map((s, i) => (
+                      <span key={i} className="skill-badge">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // PAGE 2: Projects View (Dynamic Filter & Architecture Toggle State)
+    // =========================================================================
+    function ProjectsView() {
+      const [category, setCategory] = useState('All');
+      const [showArch, setShowArch] = useState(false);
+
+      const filterOptions = ['All', 'Full-Stack', 'Backend & Systems', 'Algorithms'];
+
+      const visibleProjects = category === 'All'
+        ? rawProjects
+        : rawProjects.filter(p => p.category === category);
+
+      return (
+        <div>
+          <div className="section-header" style={{ marginTop: '1rem' }}>
+            <div>
+              <h1 className="section-heading">Featured Projects</h1>
+              <p className="page-subtitle">Multi-page routing with reactive state filtering and content toggle.</p>
+            </div>
+            <span className="section-tag">Route: /projects</span>
+          </div>
+
+          <div className="projects-controls-bar">
+            <div className="filter-pill-group">
+              {filterOptions.map(opt => (
+                <button
+                  key={opt}
+                  onClick={() => setCategory(opt)}
+                  className={`filter-btn ${category === opt ? 'active' : ''}`}
+                >
+                  {opt} {opt === 'All' ? `(${rawProjects.length})` : ''}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowArch(prev => !prev)}
+              className="toggle-details-btn"
+            >
+              {showArch ? 'Hide Architecture Notes 👁️' : 'Show Architecture Notes 👁️'}
+            </button>
+          </div>
+
+          <div className="results-counter">
+            Showing <strong>{visibleProjects.length}</strong> of {rawProjects.length} projects for filter: <em>"{category}"</em>
+          </div>
+
+          <div className="projects-grid">
+            {visibleProjects.map(project => (
+              <article key={project.id} className="project-card">
+                <div className="project-card-header">
+                  <div>
+                    <h3 className="project-card-title">{project.title}</h3>
+                    <span className="project-category-badge">{project.category}</span>
+                  </div>
+                  <div>
+                    <a href={project.github} target="_blank" className="card-link-btn">Code ↗</a>
+                    <a href={project.live} target="_blank" className="card-link-btn highlight">Demo ↗</a>
+                  </div>
+                </div>
+
+                <p className="project-card-desc">{project.description}</p>
+
+                {showArch && (
+                  <div className="architecture-box">
+                    <strong>Architecture Notes (Reactive State):</strong>
+                    <ul>
+                      <li>Independent component composition with props passing.</li>
+                      <li>Reactive filter with sub-10ms instantaneous DOM update.</li>
+                    </ul>
+                  </div>
+                )}
+
+                <div className="project-card-tags">
+                  {project.tags.map((t, i) => (
+                    <span key={i} className="project-tag-pill">{t}</span>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // PAGE 3: Contact View (Controlled Form Input & Validation State)
+    // =========================================================================
+    function ContactView({ student }) {
+      const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: 'Internship Opportunity',
+        message: ''
+      });
+      const [isSubmitted, setIsSubmitted] = useState(false);
+      const [errors, setErrors] = useState({});
+      const [showFaq, setShowFaq] = useState(false);
+
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const errs = {};
+        if (!formData.name.trim()) errs.name = 'Full name is required';
+        if (!formData.email.trim()) errs.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = 'Valid email is required';
+        if (!formData.message.trim()) errs.message = 'Message cannot be blank';
+
+        if (Object.keys(errs).length > 0) {
+          setErrors(errs);
+          return;
+        }
+
+        setIsSubmitted(true);
+        setErrors({});
+      };
+
+      const handleReset = () => {
+        setFormData({ name: '', email: '', subject: 'Internship Opportunity', message: '' });
+        setIsSubmitted(false);
+      };
+
+      return (
+        <div>
+          <div className="section-header" style={{ marginTop: '1rem' }}>
+            <div>
+              <h1 className="section-heading">Contact Me</h1>
+              <p className="page-subtitle">Controlled form state handling with reactive validation and feedback.</p>
+            </div>
+            <span className="section-tag">Route: /contact</span>
+          </div>
+
+          <div className="contact-grid-layout">
+            <div className="contact-info-panel">
+              <div className="info-card">
+                <h3 className="info-heading">Direct Details</h3>
+                <p className="info-item"><strong>Student:</strong> {student.name}</p>
+                <p className="info-item"><strong>Degree:</strong> {student.degree}</p>
+                <p className="info-item"><strong>Email:</strong> <span className="mono-text">{student.email}</span></p>
+                <p className="info-item"><strong>Status:</strong> 5th Semester Undergrad</p>
+              </div>
+
+              <div className="faq-toggle-card">
+                <button
+                  type="button"
+                  onClick={() => setShowFaq(prev => !prev)}
+                  className="faq-toggle-btn"
+                >
+                  <span>{showFaq ? '▼ Hide Availability FAQ' : '▶ Show Availability FAQ'}</span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--accent-color)' }}>Reactive State</span>
+                </button>
+                {showFaq && (
+                  <div className="faq-content-box">
+                    <p><strong>Available:</strong> Summer 2025/2026 Internships</p>
+                    <p style={{ marginTop: '0.4rem' }}><strong>Core Skills:</strong> React, C++, Node.js, SQL</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="contact-form-panel">
+              {isSubmitted ? (
+                <div className="submission-success-card">
+                  <div className="success-icon">✓</div>
+                  <h3 className="success-title">Message Received!</h3>
+                  <p className="success-desc">
+                    Thank you <strong>{formData.name}</strong>. Your inquiry regarding <em>"{formData.subject}"</em> has been logged in React state.
+                  </p>
+                  <div className="submitted-preview-box">
+                    <p><strong>From:</strong> {formData.email}</p>
+                    <p><strong>Message:</strong> "{formData.message}"</p>
+                  </div>
+                  <button onClick={handleReset} className="btn btn-primary" style={{ marginTop: '1rem' }}>
+                    Send Another Message
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} noValidate>
+                  <h3 className="form-title">Send a Direct Message</h3>
+
+                  <div className="form-group">
+                    <label className="form-label">Full Name <span style={{ color: 'var(--error-color)' }}>*</span></label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="e.g. Alex Sharma"
+                      className={`form-input ${errors.name ? 'input-error' : ''}`}
+                    />
+                    {errors.name && <span className="error-message">{errors.name}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Email Address <span style={{ color: 'var(--error-color)' }}>*</span></label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="alex@domain.com"
+                      className={`form-input ${errors.email ? 'input-error' : ''}`}
+                    />
+                    {errors.email && <span className="error-message">{errors.email}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Subject</label>
+                    <select
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className="form-input"
+                    >
+                      <option value="Internship Opportunity">Internship Opportunity</option>
+                      <option value="Project Collaboration">Project Collaboration</option>
+                      <option value="Technical Query">Technical Query / Discussion</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <div className="label-with-counter">
+                      <label className="form-label">Message <span style={{ color: 'var(--error-color)' }}>*</span></label>
+                      <span className="char-counter">{formData.message.length} chars</span>
+                    </div>
+                    <textarea
+                      name="message"
+                      rows="4"
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Hi Rishi, I'd like to discuss an opportunity..."
+                      className={`form-input form-textarea ${errors.message ? 'input-error' : ''}`}
+                    ></textarea>
+                    {errors.message && <span className="error-message">{errors.message}</span>}
+                  </div>
+
+                  <div className="form-actions">
+                    <button type="submit" className="btn btn-primary">
+                      Submit Message
+                    </button>
+                    <button type="button" onClick={handleReset} className="btn btn-secondary">
+                      Clear
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // MAIN APP: Multi-Page Route & Theme State Controller
+    // =========================================================================
+    function App() {
+      const [currentRoute, setCurrentRoute] = useState('home');
+      const [theme, setTheme] = useState('light');
+
+      useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+      }, [theme]);
+
+      const toggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+      };
+
+      return (
+        <div className="portfolio-app">
+          {/* Practical 2 Header Banner */}
+          <div className="lab-banner">
+            <div>
+              <span className="lab-badge">Practical 2</span>
+              <strong style={{ marginLeft: '0.5rem' }}>State Management &amp; Multi-Page Routing in React</strong>
+            </div>
+            <span>Routes: Home, Projects, Contact</span>
+          </div>
+
+          {/* Navigation Bar */}
+          <header className="header-container">
+            <div className="header-top">
+              <span onClick={() => setCurrentRoute('home')} className="brand-logo">
+                {studentData.name.charAt(0)}<span>.</span>
+              </span>
+
+              <nav className="nav-menu">
+                <button
+                  onClick={() => setCurrentRoute('home')}
+                  className={`nav-btn ${currentRoute === 'home' ? 'active' : ''}`}
+                >
+                  Home
+                </button>
+                <button
+                  onClick={() => setCurrentRoute('projects')}
+                  className={`nav-btn ${currentRoute === 'projects' ? 'active' : ''}`}
+                >
+                  Projects
+                </button>
+                <button
+                  onClick={() => setCurrentRoute('contact')}
+                  className={`nav-btn ${currentRoute === 'contact' ? 'active' : ''}`}
+                >
+                  Contact
+                </button>
+
+                <button
+                  onClick={toggleTheme}
+                  className="theme-toggle-btn"
+                  title="Toggle theme"
+                >
+                  {theme === 'dark' ? '☀️' : '🌙'}
+                </button>
+              </nav>
+            </div>
+
+            <div className="status-pill">
+              <span className="status-dot"></span>
+              <span>{studentData.statusText}</span>
+            </div>
+          </header>
+
+          {/* Dynamic Route View Rendering */}
+          <main>
+            {currentRoute === 'home' && (
+              <HomeView
+                student={studentData}
+                onNavigate={(route) => setCurrentRoute(route)}
+              />
+            )}
+            {currentRoute === 'projects' && (
+              <ProjectsView />
+            )}
+            {currentRoute === 'contact' && (
+              <ContactView student={studentData} />
+            )}
+          </main>
+
+          {/* Footer */}
+          <footer className="footer-container">
+            <p>&copy; {new Date().getFullYear()} {studentData.name} &bull; {studentData.degree} ({studentData.semester})</p>
+            <p style={{ marginTop: '0.25rem' }}>
+              Practical 2: React State Management (useState) &amp; Multi-Route Navigation (React Router).
+            </p>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

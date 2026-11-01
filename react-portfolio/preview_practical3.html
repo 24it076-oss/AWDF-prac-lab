@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical 3: API Integration & Data Rendering in React</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #fafafa;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f4f4f5;
+      --border-color: #e4e4e7;
+      --border-hover: #d4d4d8;
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --text-muted: #71717a;
+      --accent-color: #2563eb;
+      --accent-subtle: #eff6ff;
+      --badge-bg: #ecfdf5;
+      --badge-text: #065f46;
+      --badge-border: #a7f3d0;
+      --badge-dot: #10b981;
+      --error-color: #dc2626;
+      --error-bg: #fef2f2;
+      --error-border: #fecaca;
+      --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #09090b;
+      --bg-surface: #121215;
+      --bg-subtle: #1c1c21;
+      --border-color: #27272a;
+      --border-hover: #3f3f46;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-color: #3b82f6;
+      --accent-subtle: rgba(59, 130, 246, 0.12);
+      --badge-bg: rgba(16, 185, 129, 0.1);
+      --badge-text: #34d399;
+      --badge-border: rgba(16, 185, 129, 0.25);
+      --error-color: #f87171;
+      --error-bg: rgba(239, 68, 68, 0.1);
+      --error-border: rgba(239, 68, 68, 0.25);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    .portfolio-app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3.5rem 1.5rem;
+    }
+
+    .lab-banner {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--accent-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .lab-badge {
+      background: var(--accent-color);
+      color: #fff;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.72rem;
+    }
+
+    .header-container {
+      padding: 1.5rem 0 1.25rem 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .brand-logo span { color: var(--accent-color); }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .nav-btn.active {
+      color: var(--accent-color);
+      background-color: var(--accent-subtle);
+      font-weight: 600;
+      border-color: var(--border-color);
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      border: 1px solid var(--badge-border);
+      font-size: 0.775rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-top: 1rem;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--badge-dot);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .section-heading {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .page-subtitle {
+      font-size: 0.885rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    .section-tag {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 1.15rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-primary {
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: var(--text-primary);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    /* API Controls */
+    .api-control-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.35rem 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .api-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 0.885rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .quick-presets {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .preset-label {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      margin-right: 0.25rem;
+    }
+
+    .preset-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.775rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+
+    .preset-btn.active {
+      background: var(--accent-subtle);
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+      font-weight: 600;
+    }
+
+    .test-error-btn {
+      margin-left: auto;
+      color: var(--error-color);
+      border-color: var(--error-border);
+      background: var(--error-bg);
+    }
+
+    /* Loading Spinner */
+    .loading-container {
+      text-align: center;
+      padding: 2.5rem 1rem;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      margin: 0 auto 1rem auto;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .skeleton-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .skeleton-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .skeleton-line {
+      background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--border-color) 50%, var(--bg-subtle) 75%);
+      background-size: 200% 100%;
+      border-radius: 4px;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-title { height: 16px; width: 45%; margin-bottom: 0.75rem; }
+    .skeleton-desc { height: 12px; width: 85%; margin-bottom: 0.6rem; }
+    .skeleton-footer { height: 12px; width: 30%; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Error Alert */
+    .error-alert-box {
+      display: flex;
+      gap: 1rem;
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .error-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--error-color);
+      margin-bottom: 0.35rem;
+    }
+
+    .error-description {
+      font-size: 0.885rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    /* Repo Cards */
+    .repos-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .status-online-dot {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: #10b981;
+    }
+
+    .repos-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .repo-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .repo-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.45rem;
+    }
+
+    .repo-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .repo-link {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+
+    .repo-visibility {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      border-radius: 9999px;
+      padding: 0.1rem 0.45rem;
+    }
+
+    .repo-description {
+      font-size: 0.885rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .repo-meta-footer {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      font-size: 0.775rem;
+      color: var(--text-muted);
+    }
+
+    .repo-lang-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--text-secondary);
+    }
+
+    .lang-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+    }
+
+    .repo-source-btn {
+      margin-left: auto;
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--accent-color);
+      text-decoration: none;
+      padding: 0.2rem 0.5rem;
+      background: var(--accent-subtle);
+      border-radius: 4px;
+    }
+
+    .footer-container {
+      padding-top: 2.5rem;
+      text-align: center;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+
+    const FALLBACK_REPOS = [
+      {
+        id: 101,
+        name: 'campus-notes-portal',
+        description: 'Full-stack collaborative portal for 5th semester IT students to share lecture notes and previous question papers.',
+        html_url: 'https://github.com/octocat/campus-notes-portal',
+        language: 'JavaScript',
+        stargazers_count: 24,
+        forks_count: 7,
+        updated_at: '2026-10-28T10:00:00Z'
+      },
+      {
+        id: 102,
+        name: 'high-throughput-url-shortener',
+        description: 'URL compressor with sub-30ms redirect queries, Redis in-memory caching, and geographic analytics dashboard.',
+        html_url: 'https://github.com/octocat/high-throughput-url-shortener',
+        language: 'TypeScript',
+        stargazers_count: 58,
+        forks_count: 12,
+        updated_at: '2026-10-25T14:30:00Z'
+      },
+      {
+        id: 103,
+        name: 'graph-algorithm-visualizer',
+        description: 'Interactive HTML5 Canvas visualizer for Dijkstra, BFS, DFS, and topological sort algorithms.',
+        html_url: 'https://github.com/octocat/graph-algorithm-visualizer',
+        language: 'HTML',
+        stargazers_count: 41,
+        forks_count: 9,
+        updated_at: '2026-10-18T08:15:00Z'
+      }
+    ];
+
+    // 1. REUSABLE LOADING SPINNER COMPONENT
+    function LoadingSpinner({ message }) {
+      return (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p className="loading-text">{message || 'Fetching live repositories from GitHub API...'}</p>
+          <div className="skeleton-grid">
+            <div className="skeleton-card">
+              <div className="skeleton-line skeleton-title"></div>
+              <div className="skeleton-line skeleton-desc"></div>
+              <div className="skeleton-line skeleton-footer"></div>
+            </div>
+            <div className="skeleton-card">
+              <div className="skeleton-line skeleton-title"></div>
+              <div className="skeleton-line skeleton-desc"></div>
+              <div className="skeleton-line skeleton-footer"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 2. REUSABLE ERROR MESSAGE COMPONENT
+    function ErrorMessage({ message, onRetry, onLoadDemoData }) {
+      return (
+        <div className="error-alert-box">
+          <div style={{ fontSize: '1.5rem' }}>⚠️</div>
+          <div>
+            <h3 className="error-title">API Request Failed</h3>
+            <p className="error-description">{message}</p>
+            <div className="error-actions">
+              {onRetry && (
+                <button onClick={onRetry} className="btn btn-primary btn-sm">
+                  ↻ Try Again
+                </button>
+              )}
+              {onLoadDemoData && (
+                <button onClick={onLoadDemoData} className="btn btn-secondary btn-sm">
+                  Load Fallback Demo Repos
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 3. REUSABLE REPO CARD COMPONENT
+    function RepoCard({ repo }) {
+      const formattedDate = new Date(repo.updated_at).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric'
+      });
+      return (
+        <article className="repo-card">
+          <div className="repo-card-top">
+            <h3 className="repo-name">
+              <a href={repo.html_url} target="_blank" rel="noreferrer" className="repo-link">
+                {repo.name}
+              </a>
+            </h3>
+            <span className="repo-visibility">Public</span>
+          </div>
+          <p className="repo-description">
+            {repo.description || 'No description provided by the repository owner.'}
+          </p>
+          <div className="repo-meta-footer">
+            {repo.language && (
+              <span className="repo-lang-pill">
+                <span className="lang-color-dot"></span>
+                {repo.language}
+              </span>
+            )}
+            <span>⭐ {repo.stargazers_count}</span>
+            <span>🍴 {repo.forks_count}</span>
+            <span>Updated {formattedDate}</span>
+            <a href={repo.html_url} target="_blank" rel="noreferrer" className="repo-source-btn">
+              View on GitHub ↗
+            </a>
+          </div>
+        </article>
+      );
+    }
+
+    // 4. MAIN PRACTICAL 3 PAGE
+    function RepositoriesPage() {
+      const [username, setUsername] = useState('google');
+      const [searchInput, setSearchInput] = useState('google');
+      const [repos, setRepos] = useState([]);
+      const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      const fetchRepositories = useCallback(async (userToFetch) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const res = await fetch(`https://api.github.com/users/${encodeURIComponent(userToFetch)}/repos?sort=updated&per_page=4`);
+          if (!res.ok) {
+            if (res.status === 404) throw new Error(`GitHub user "${userToFetch}" not found (404).`);
+            if (res.status === 403) throw new Error('GitHub API rate limit reached (60 req/hr). Click below to view fallback data.');
+            throw new Error(`API returned HTTP status ${res.status}.`);
+          }
+          const data = await res.json();
+          setRepos(data);
+        } catch (err) {
+          setError(err.message || 'Network error occurred while fetching repositories.');
+        } finally {
+          setIsLoading(false);
+        }
+      }, []);
+
+      useEffect(() => {
+        fetchRepositories(username);
+      }, [username, fetchRepositories]);
+
+      const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchInput.trim()) setUsername(searchInput.trim());
+      };
+
+      return (
+        <div>
+          <div className="section-header" style={{ marginTop: '1rem' }}>
+            <div>
+              <h1 className="section-heading">Live GitHub Repositories</h1>
+              <p className="page-subtitle">
+                Practical 3: Consuming GitHub REST API asynchronously with loading spinner &amp; error states.
+              </p>
+            </div>
+            <span className="section-tag">REST API: api.github.com</span>
+          </div>
+
+          {/* Search Controls */}
+          <div className="api-control-panel">
+            <form onSubmit={handleSearch}>
+              <div className="search-input-group">
+                <span>🔍</span>
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Enter GitHub username (e.g. google, octocat)..."
+                  className="api-input"
+                />
+                <button type="submit" className="btn btn-primary btn-sm">
+                  Fetch Repos
+                </button>
+              </div>
+            </form>
+
+            <div className="quick-presets">
+              <span className="preset-label">Quick Presets:</span>
+              {['google', 'octocat', 'facebook'].map(u => (
+                <button
+                  key={u}
+                  onClick={() => { setSearchInput(u); setUsername(u); }}
+                  className={`preset-btn ${username === u ? 'active' : ''}`}
+                >
+                  @{u}
+                </button>
+              ))}
+              <button
+                onClick={() => setUsername('this-user-definitely-does-not-exist-99999')}
+                className="preset-btn test-error-btn"
+              >
+                ⚠️ Test Error State
+              </button>
+            </div>
+          </div>
+
+          {/* Conditional Rendering of 3 States */}
+          <div>
+            {isLoading && (
+              <LoadingSpinner message={`Querying GitHub REST API for @${username}...`} />
+            )}
+
+            {!isLoading && error && (
+              <ErrorMessage
+                message={error}
+                onRetry={() => fetchRepositories(username)}
+                onLoadDemoData={() => { setError(null); setRepos(FALLBACK_REPOS); }}
+              />
+            )}
+
+            {!isLoading && !error && (
+              <div>
+                <div className="repos-meta-bar">
+                  <span>Found <strong>{repos.length}</strong> public repositories for <strong>@{username}</strong></span>
+                  <span className="status-online-dot">🟢 Live Data Rendered</span>
+                </div>
+                <div className="repos-grid">
+                  {repos.map(r => (
+                    <RepoCard key={r.id} repo={r} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // MAIN APP
+    function App() {
+      const [theme, setTheme] = useState('light');
+      useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+      }, [theme]);
+
+      return (
+        <div className="portfolio-app">
+          <div className="lab-banner">
+            <div>
+              <span className="lab-badge">Practical 3 Output</span>
+              <strong style={{ marginLeft: '0.5rem' }}>API Integration &amp; Data Rendering in React</strong>
+            </div>
+            <span>States: Loading, Error, Success</span>
+          </div>
+
+          <header className="header-container">
+            <div className="header-top">
+              <span className="brand-logo">R<span>.</span></span>
+              <nav className="nav-menu">
+                <span className="nav-btn">Home</span>
+                <span className="nav-btn">Projects</span>
+                <span className="nav-btn active">Repositories (Live API)</span>
+                <span className="nav-btn">Contact</span>
+                <button
+                  onClick={() => setTheme(p => p === 'light' ? 'dark' : 'light')}
+                  className="theme-toggle-btn"
+                >
+                  {theme === 'dark' ? '☀️' : '🌙'}
+                </button>
+              </nav>
+            </div>
+            <div className="status-pill">
+              <span className="status-dot"></span>
+              <span>5th Sem IT Undergrad &bull; REST API Integrated</span>
+            </div>
+          </header>
+
+          <main>
+            <RepositoriesPage />
+          </main>
+
+          <footer className="footer-container">
+            <p>&copy; 2026 Rishi &bull; B.Tech in Information Technology (5th Sem)</p>
+            <p style={{ marginTop: '0.25rem' }}>
+              Practical 3: Asynchronous fetch(), useEffect, LoadingSpinner, and ErrorMessage components.
+            </p>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

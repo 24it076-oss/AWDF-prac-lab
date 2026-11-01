@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React Student Portfolio - Dark Mode & Projects/Footer</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #09090b;
+      --bg-surface: #121215;
+      --bg-subtle: #1c1c21;
+      --border-color: #27272a;
+      --border-hover: #3f3f46;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-color: #3b82f6;
+      --accent-subtle: rgba(59, 130, 246, 0.12);
+      --badge-bg: rgba(16, 185, 129, 0.1);
+      --badge-text: #34d399;
+      --badge-border: rgba(16, 185, 129, 0.25);
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      line-height: 1.6;
+    }
+
+    .portfolio-app {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 3rem 1.5rem;
+    }
+
+    .lab-banner {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--accent-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .lab-badge {
+      background: var(--accent-color);
+      color: #fff;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.72rem;
+    }
+
+    .section-container {
+      padding: 1.5rem 0 2rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-heading {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .section-tag {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .projects-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .project-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .project-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-link-btn {
+      font-size: 0.775rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      margin-left: 0.4rem;
+    }
+
+    .card-link-btn.highlight {
+      color: var(--accent-color);
+      background-color: var(--accent-subtle);
+      border-color: transparent;
+    }
+
+    .project-card-desc {
+      font-size: 0.885rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .project-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .project-tag-pill {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    .footer-container {
+      padding-top: 2rem;
+    }
+
+    .contact-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .contact-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .contact-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.885rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .contact-buttons-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.55rem 1.15rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+      border: 1px solid var(--text-primary);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+
+    .footer-subtext {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const projectsData = [
+      {
+        id: 1,
+        title: "CampusHub — IT Resource & Event Portal",
+        description: "A collaborative portal for IT department students to exchange semester notes, previous question papers, and track hackathons.",
+        tags: ["React", "Node.js", "MongoDB", "Express"],
+        github: "https://github.com/your-username/campushub",
+        live: "https://campushub-demo.vercel.app"
+      },
+      {
+        id: 2,
+        title: "SnipLink — URL Shortener & Analytics",
+        description: "High-performance link compressor with click rate analytics, geo-referrer charts, and Redis caching.",
+        tags: ["Node.js", "PostgreSQL", "Redis", "REST API"],
+        github: "https://github.com/your-username/sniplink",
+        live: "https://sniplink-demo.vercel.app"
+      },
+      {
+        id: 3,
+        title: "AlgoVisualizer — Pathfinding & Sorting",
+        description: "Interactive visualizer for Dijkstra, BFS, and sorting algorithms built to reinforce semester exam concepts.",
+        tags: ["JavaScript", "HTML5 Canvas", "Algorithms"],
+        github: "https://github.com/your-username/algovisualizer",
+        live: "https://algovisualizer-demo.vercel.app"
+      }
+    ];
+
+    function ProjectCard({ title, description, tags, github, live }) {
+      return (
+        <article className="project-card">
+          <div className="project-card-header">
+            <h3 className="project-card-title">{title}</h3>
+            <div>
+              <a href={github} target="_blank" rel="noreferrer" className="card-link-btn">Code ↗</a>
+              <a href={live} target="_blank" rel="noreferrer" className="card-link-btn highlight">Demo ↗</a>
+            </div>
+          </div>
+          <p className="project-card-desc">{description}</p>
+          <div className="project-card-tags">
+            {tags.map((t, idx) => (
+              <span key={idx} className="project-tag-pill">{t}</span>
+            ))}
+          </div>
+        </article>
+      );
+    }
+
+    function Footer({ student }) {
+      return (
+        <footer id="contact" className="footer-container">
+          <div className="contact-card">
+            <h3 className="contact-title">Let's Connect</h3>
+            <p className="contact-subtitle">
+              Interested in discussing internship opportunities or engineering collaborations?
+            </p>
+            <div className="contact-buttons-row">
+              <a href={`mailto:${student.email}`} className="btn btn-primary">
+                Send an Email
+              </a>
+              <button className="btn btn-secondary">
+                Copied to Clipboard! ✓
+              </button>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p>
+              &copy; 2026 {student.name} &bull; {student.degree} ({student.semester})
+            </p>
+            <p className="footer-subtext">
+              Built with React &amp; Component Architecture (Header, About, Skills, Projects, Footer).
+            </p>
+          </div>
+        </footer>
+      );
+    }
+
+    function App() {
+      const student = {
+        name: "Rishi",
+        degree: "B.Tech in Information Technology",
+        semester: "5th Semester",
+        email: "rishi@example.com"
+      };
+
+      return (
+        <div className="portfolio-app">
+          <div className="lab-banner">
+            <div>
+              <span className="lab-badge">Dark Theme Mode</span>
+              <strong style={{ marginLeft: '0.5rem' }}>Component Architecture: Projects &amp; Footer Layout</strong>
+            </div>
+            <span>Stateful Reusable Components</span>
+          </div>
+
+          <section id="projects" className="section-container">
+            <div className="section-header">
+              <h2 className="section-heading">Featured Projects (Component Composition)</h2>
+              <span className="section-tag">Semester V Practical Work</span>
+            </div>
+            <div className="projects-grid">
+              {projectsData.map(p => (
+                <ProjectCard key={p.id} {...p} />
+              ))}
+            </div>
+          </section>
+
+          <Footer student={student} />
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

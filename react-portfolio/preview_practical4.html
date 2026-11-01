@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical 4: Building a RESTful API with Node.js and Express</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #fafafa;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f4f4f5;
+      --border-color: #e4e4e7;
+      --border-hover: #d4d4d8;
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --text-muted: #71717a;
+      --accent-color: #2563eb;
+      --accent-subtle: #eff6ff;
+      --badge-bg: #ecfdf5;
+      --badge-text: #065f46;
+      --error-color: #dc2626;
+      --error-bg: #fef2f2;
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+
+    .portfolio-app {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .lab-banner {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--accent-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+    }
+
+    .nav-btn.active {
+      color: var(--accent-color);
+      background-color: var(--accent-subtle);
+      font-weight: 600;
+      border-color: var(--border-color);
+    }
+
+    .pipeline-flow-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.65rem 1rem;
+      font-size: 0.785rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .flow-badge {
+      background: var(--accent-color);
+      color: #fff;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.72rem;
+      margin-right: 0.25rem;
+    }
+
+    .flow-step { font-family: var(--font-mono); }
+
+    .task-manager-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .task-form-panel, .tasks-display-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.35rem;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      margin: 0 0 1rem 0;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.825rem; font-weight: 600; margin-bottom: 0.35rem; }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 1.15rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+
+    .btn-sm { padding: 0.25rem 0.6rem; font-size: 0.775rem; }
+    .btn-primary { background: #18181b; color: #fff; }
+    .btn-secondary { background: var(--bg-subtle); color: var(--text-primary); border-color: var(--border-color); }
+
+    .task-cards-list { display: flex; flex-direction: column; gap: 0.85rem; }
+    
+    .task-card-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }
+
+    .task-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.35rem;
+    }
+
+    .task-id-badge {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      margin-right: 0.4rem;
+    }
+
+    .priority-badge {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-right: 0.35rem;
+    }
+
+    .priority-high { background: rgba(220, 38, 38, 0.12); color: var(--error-color); }
+    .priority-medium { background: rgba(245, 158, 11, 0.12); color: #d97706; }
+
+    .status-pill-badge {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .status-in-progress { background: var(--accent-subtle); color: var(--accent-color); }
+    .status-pending { background: #fff; border: 1px solid var(--border-color); color: var(--text-muted); }
+    .status-completed { background: var(--badge-bg); color: var(--badge-text); }
+
+    .task-item-desc { font-size: 0.85rem; color: var(--text-secondary); margin: 0.35rem 0 0.65rem 0; }
+
+    /* Middleware Terminal Logger */
+    .middleware-logger-terminal {
+      background: #09090b;
+      border: 1px solid #27272a;
+      border-radius: 10px;
+      overflow: hidden;
+      font-family: var(--font-mono);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .terminal-header {
+      background: #18181b;
+      padding: 0.6rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-bottom: 1px solid #27272a;
+    }
+
+    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .terminal-dot.red { background: #ef4444; }
+    .terminal-dot.yellow { background: #f59e0b; }
+    .terminal-dot.green { background: #10b981; }
+
+    .terminal-title { font-size: 0.75rem; color: #a1a1aa; margin-left: 0.35rem; }
+
+    .terminal-body {
+      padding: 0.85rem 1rem;
+      font-size: 0.775rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .log-success { color: #34d399; }
+    .log-info { color: #60a5fa; }
+    .log-warn { color: #fbbf24; }
+    .log-error { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const INITIAL_TASKS = [
+      {
+        id: 1,
+        title: 'Complete Practical 4 Express API Lab Report',
+        description: 'Implement CRUD endpoints, request logger, and global error middleware for viva submission.',
+        status: 'In Progress',
+        priority: 'High',
+        createdAt: '2026-11-01T10:00:00Z'
+      },
+      {
+        id: 2,
+        title: 'Review Operating Systems Virtual Memory & Paging',
+        description: 'Prepare lecture notes on page tables, TLB cache, and page fault replacement algorithms.',
+        status: 'Pending',
+        priority: 'Medium',
+        createdAt: '2026-10-30T14:30:00Z'
+      },
+      {
+        id: 3,
+        title: 'Practice LeetCode Graphs & Shortest Path',
+        description: 'Solve 3 graph traversal problems using BFS, DFS, and Dijkstra algorithm in C++.',
+        status: 'Completed',
+        priority: 'High',
+        createdAt: '2026-10-28T18:00:00Z'
+      }
+    ];
+
+    function App() {
+      const [tasks, setTasks] = useState(INITIAL_TASKS);
+      const [nextId, setNextId] = useState(4);
+      const [title, setTitle] = useState('');
+      const [desc, setDesc] = useState('');
+      const [priority, setPriority] = useState('High');
+      const [logs, setLogs] = useState([
+        { id: 1, text: '[2026-11-01T15:45:00Z] GET /api/tasks -> 200 OK (8ms)', type: 'success' },
+        { id: 2, text: '[Middleware Pipeline] cors() -> requestLogger -> express.json() active', type: 'info' }
+      ]);
+
+      const addLog = (text, type = 'success') => {
+        const time = new Date().toISOString();
+        setLogs(prev => [{ id: Date.now(), text: `[${time}] ${text}`, type }, ...prev]);
+      };
+
+      const handleCreate = (e) => {
+        e.preventDefault();
+        if (!title.trim()) {
+          addLog('POST /api/tasks -> 400 Bad Request (Validation middleware: title required)', 'error');
+          return;
+        }
+        const created = {
+          id: nextId,
+          title: title.trim(),
+          description: desc.trim() || 'No description provided.',
+          status: 'Pending',
+          priority
+        };
+        setTasks([created, ...tasks]);
+        setNextId(nextId + 1);
+        setTitle('');
+        setDesc('');
+        addLog(`POST /api/tasks -> 201 Created (Task ID ${nextId} created)`, 'success');
+      };
+
+      const handleToggle = (id) => {
+        setTasks(tasks.map(t => {
+          if (t.id === id) {
+            const nextStatus = t.status === 'Pending' ? 'In Progress' : t.status === 'In Progress' ? 'Completed' : 'Pending';
+            addLog(`PUT /api/tasks/${id} -> 200 OK (Status changed to ${nextStatus})`, 'success');
+            return { ...t, status: nextStatus };
+          }
+          return t;
+        }));
+      };
+
+      const handleDelete = (id) => {
+        setTasks(tasks.filter(t => t.id !== id));
+        addLog(`DELETE /api/tasks/${id} -> 200 OK (Task removed from database)`, 'warn');
+      };
+
+      const handleTriggerError = () => {
+        addLog('GET /api/tasks/99999 -> Global Error Handler: 404 Not Found (Task ID 99999 does not exist)', 'error');
+      };
+
+      return (
+        <div className="portfolio-app">
+          <div className="lab-banner">
+            <div>
+              <span style={{ background: '#2563eb', color: '#fff', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>Practical 4 Output</span>
+              <strong style={{ marginLeft: '0.5rem' }}>RESTful API with Node.js &amp; Express &bull; Task Management CRUD</strong>
+            </div>
+            <span>Middleware Pipeline: Active</span>
+          </div>
+
+          <header className="header-container">
+            <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>R<span style={{ color: '#2563eb' }}>.</span></span>
+            <nav style={{ display: 'flex', gap: '0.5rem' }}>
+              <span className="nav-btn">Home</span>
+              <span className="nav-btn">Projects</span>
+              <span className="nav-btn">Repositories</span>
+              <span className="nav-btn active">Task API (CRUD)</span>
+              <span className="nav-btn">Contact</span>
+            </nav>
+          </header>
+
+          <div className="pipeline-flow-banner">
+            <span className="flow-badge">Express Pipeline</span>
+            <span className="flow-step">1. CORS</span> &rarr;
+            <span className="flow-step">2. Logger</span> &rarr;
+            <span className="flow-step">3. JSON Parser</span> &rarr;
+            <span className="flow-step">4. Router</span> &rarr;
+            <span className="flow-step">5. Validator</span> &rarr;
+            <span className="flow-step">6. Error Handler</span>
+          </div>
+
+          <div className="task-manager-grid">
+            {/* Create Task Form */}
+            <div className="task-form-panel">
+              <h2 className="panel-title">POST /api/tasks (Create)</h2>
+              <form onSubmit={handleCreate}>
+                <div className="form-group">
+                  <label className="form-label">Task Title *</label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder="e.g. Implement Redis Cache"
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Description</label>
+                  <input
+                    type="text"
+                    value={desc}
+                    onChange={e => setDesc(e.target.value)}
+                    placeholder="Technical spec or lab note..."
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Priority</label>
+                  <select
+                    value={priority}
+                    onChange={e => setPriority(e.target.value)}
+                    className="form-input"
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                  + Send POST Request
+                </button>
+              </form>
+
+              <button
+                type="button"
+                onClick={handleTriggerError}
+                className="btn btn-secondary btn-sm"
+                style={{ width: '100%', marginTop: '1rem', color: '#dc2626' }}
+              >
+                ⚠️ Trigger 404 Error Middleware
+              </button>
+            </div>
+
+            {/* Read & Update/Delete Tasks */}
+            <div className="tasks-display-panel">
+              <h2 className="panel-title">GET /api/tasks ({tasks.length} Items)</h2>
+              <div className="task-cards-list">
+                {tasks.map(t => (
+                  <div key={t.id} className="task-card-item">
+                    <div className="task-header-line">
+                      <div>
+                        <span className="task-id-badge">#{t.id}</span>
+                        <strong>{t.title}</strong>
+                      </div>
+                      <div>
+                        <span className={`priority-badge priority-${t.priority.toLowerCase()}`}>{t.priority}</span>
+                        <span className={`status-pill-badge status-${t.status.toLowerCase().replace(' ', '-')}`}>{t.status}</span>
+                      </div>
+                    </div>
+                    <p className="task-item-desc">{t.description}</p>
+                    <div style={{ display: 'flex', gap: '0.45rem' }}>
+                      <button onClick={() => handleToggle(t.id)} className="btn btn-secondary btn-sm">
+                        ↻ PUT: Status
+                      </button>
+                      <button onClick={() => handleDelete(t.id)} className="btn btn-secondary btn-sm" style={{ color: '#dc2626' }}>
+                        🗑️ DELETE
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Terminal Console */}
+          <div className="middleware-logger-terminal">
+            <div className="terminal-header">
+              <span className="terminal-dot red"></span>
+              <span className="terminal-dot yellow"></span>
+              <span className="terminal-dot green"></span>
+              <span className="terminal-title">Live Express Request Logger Middleware (requestLogger)</span>
+            </div>
+            <div className="terminal-body">
+              {logs.map(l => (
+                <div key={l.id} className={`terminal-log-line log-${l.type}`}>
+                  {l.text}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

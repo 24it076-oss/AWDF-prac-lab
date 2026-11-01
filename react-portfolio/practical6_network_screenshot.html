@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0b0f19; color: #f9fafb; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; padding: 24px; }
+    .hdr { background: #111827; border-bottom: 1px solid #374151; padding: 14px 24px; display: flex; align-items: center; gap: 12px; margin: -24px -24px 20px; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: #6366f1; }
+    .badge { background: #6366f1; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-left: auto; }
+
+    h1 { font-size: 1.45rem; font-weight: 800; margin-bottom: 4px; }
+    .sub { font-size: 0.83rem; color: #9ca3af; margin-bottom: 18px; }
+
+    /* Architecture Diagram */
+    .arch-card { background: #111827; border: 1px solid #374151; border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+    .arch-title { font-size: 0.82rem; font-family: monospace; font-weight: 700; color: #a5b4fc; margin-bottom: 14px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .arch-node { background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px; text-align: center; }
+    .node-title { font-weight: 700; font-size: 0.82rem; margin-bottom: 4px; }
+    .node-sub { font-size: 0.7rem; color: #9ca3af; font-family: monospace; }
+    .node-port { font-size: 0.65rem; color: #10b981; font-weight: 700; margin-top: 4px; }
+
+    /* Network Inspector */
+    .terminal { border: 1px solid #4f46e5; border-radius: 10px; overflow: hidden; font-family: monospace; }
+    .term-hdr { background: #1e1b4b; border-bottom: 1px solid #4f46e5; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .dr { background: #ff5f57; } .dy { background: #ffbd2e; } .dg { background: #28c840; }
+    .term-lbl { font-size: 0.77rem; color: #a5b4fc; margin-left: 6px; font-weight: 600; }
+    .term-body { background: #0f172a; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .log-row { display: flex; gap: 14px; font-size: 0.74rem; line-height: 1.5; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .m-post { color: #38bdf8; font-weight: 700; }
+    .m-put { color: #fbbf24; font-weight: 700; }
+    .m-del { color: #f87171; font-weight: 700; }
+    .m-get { color: #34d399; font-weight: 700; }
+    .st-ok { color: #34d399; font-weight: 700; }
+    .st-warn { color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <div class="hdr">
+    <div class="logo">R<span>.</span></div>
+    <div style="color:#9ca3af;font-size:0.78rem">Rishi | 5th Sem IT B.Tech Portfolio</div>
+    <div class="badge">⚡ Practical 6 — Full Stack Integration</div>
+  </div>
+
+  <h1>Full Stack Network Request Lifecycle &amp; Architecture Flow</h1>
+  <div class="sub">React Fetch Client ⇄ Express Middleware Pipeline ⇄ Mongoose ODM ⇄ MongoDB Engine</div>
+
+  <!-- Architecture Flow -->
+  <div class="arch-card">
+    <div class="arch-title">● THREE-TIER MERN ARCHITECTURE BREAKDOWN</div>
+    <div class="arch-flow">
+      <div class="arch-node">
+        <div class="node-title" style="color:#60a5fa">1. React Client</div>
+        <div class="node-sub">FullStackTaskPage.jsx &amp; taskService.js</div>
+        <div class="node-port">PORT: 3000 / Webpack</div>
+      </div>
+      <div class="arch-node">
+        <div class="node-title" style="color:#a78bfa">2. Express REST API</div>
+        <div class="node-sub">CORS, requestLogger, taskRoutes</div>
+        <div class="node-port">PORT: 5000 / Node.js</div>
+      </div>
+      <div class="arch-node">
+        <div class="node-title" style="color:#34d399">3. Mongoose ODM</div>
+        <div class="node-sub">Task Schema, Validation &amp; Hooks</div>
+        <div class="node-port">Driver: mongoose@8.x</div>
+      </div>
+      <div class="arch-node">
+        <div class="node-title" style="color:#4ade80">4. MongoDB Database</div>
+        <div class="node-sub">Collection "tasks" &amp; BSON Documents</div>
+        <div class="node-port">PORT: 27017 / Mongo Daemon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Network Inspector Terminal -->
+  <div class="terminal">
+    <div class="term-hdr">
+      <span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span>
+      <div class="term-lbl">🌐 Full-Stack HTTP Network Inspector (Live Traffic Stream)</div>
+    </div>
+    <div class="term-body">
+      <div class="log-row">
+        <span style="color:#64748b;min-width:65px">21:58:10</span>
+        <span class="m-get" style="min-width:60px">GET</span>
+        <span style="min-width:170px;color:#cbd5e1">/api/tasks</span>
+        <span class="st-ok" style="min-width:55px">[200 OK]</span>
+        <span style="min-width:50px;color:#64748b">14ms</span>
+        <span style="color:#94a3b8">— Fetched 3 documents from MongoDB tasks collection</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#64748b;min-width:65px">21:58:25</span>
+        <span class="m-post" style="min-width:60px">POST</span>
+        <span style="min-width:170px;color:#cbd5e1">/api/tasks</span>
+        <span class="st-ok" style="min-width:55px">[201 CREATED]</span>
+        <span style="min-width:50px;color:#64748b">28ms</span>
+        <span style="color:#94a3b8">— Document inserted: _id: 6726f1a2c4e3b1d0e8f9b004, title: "Implement Real-time Data Sync"</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#64748b;min-width:65px">21:58:40</span>
+        <span class="m-put" style="min-width:60px">PUT</span>
+        <span style="min-width:170px;color:#cbd5e1">/api/tasks/6726f1a2…</span>
+        <span class="st-ok" style="min-width:55px">[200 OK]</span>
+        <span style="min-width:50px;color:#64748b">19ms</span>
+        <span style="color:#94a3b8">— Updated status: "Completed", isCompleted: true, runValidators: true</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#64748b;min-width:65px">21:58:55</span>
+        <span class="m-del" style="min-width:60px">DELETE</span>
+        <span style="min-width:170px;color:#cbd5e1">/api/tasks/6726f1a2…</span>
+        <span class="st-ok" style="min-width:55px">[200 OK]</span>
+        <span style="min-width:50px;color:#64748b">22ms</span>
+        <span style="color:#94a3b8">— findByIdAndDelete: Document removed from collection</span>
+      </div>
+      <div class="log-row">
+        <span style="color:#64748b;min-width:65px">21:59:02</span>
+        <span class="m-get" style="min-width:60px">GET</span>
+        <span style="min-width:170px;color:#cbd5e1">/api/tasks?status=Pending</span>
+        <span class="st-ok" style="min-width:55px">[200 OK]</span>
+        <span style="min-width:50px;color:#64748b">12ms</span>
+        <span style="color:#94a3b8">— Filter query executed on MongoDB index</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0b0f19; color: #f9fafb; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; padding: 24px; }
+    .hdr { background: #111827; border-bottom: 1px solid #374151; padding: 14px 24px; display: flex; align-items: center; gap: 12px; margin: -24px -24px 20px; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: #6366f1; }
+    .badge { background: #6366f1; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-left: auto; }
+
+    .sec-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .sec-title { font-size: 1.55rem; font-weight: 800; }
+    .sec-sub { color: #9ca3af; font-size: 0.83rem; margin-top: 4px; }
+    .status-badge { background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #34d399; font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+
+    .pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      background: #111827; border: 1px solid #374151; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 16px; font-size: 0.74rem; }
+    .pipe-badge { background: #6366f1; color: #fff; font-weight: 700; padding: 2px 8px; border-radius: 5px; font-size: 0.68rem; }
+    .pipe-step { color: #93c5fd; font-family: monospace; }
+
+    .grid { display: grid; grid-template-columns: 310px 1fr; gap: 16px; margin-bottom: 16px; }
+
+    .panel { background: #111827; border: 1px solid #374151; border-radius: 10px; padding: 16px; }
+    .panel-title { font-size: 0.8rem; font-family: monospace; font-weight: 700; color: #a5b4fc; margin-bottom: 12px; }
+
+    .form-group { margin-bottom: 10px; }
+    label { font-size: 0.72rem; font-weight: 600; color: #d1d5db; display: block; margin-bottom: 4px; }
+    .field { background: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 7px 10px; font-size: 0.78rem; color: #9ca3af; width: 100%; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-create { background: #6366f1; color: #fff; border: none; border-radius: 7px; padding: 9px; font-size: 0.8rem; font-weight: 700; width: 100%; }
+
+    .filter-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; }
+    .pill { border: 1px solid #374151; background: #1f2937; color: #9ca3af; border-radius: 999px; padding: 2px 8px; font-size: 0.68rem; }
+    .pill.active { background: rgba(99,102,241,0.15); border-color: #6366f1; color: #a5b4fc; }
+
+    .cards { display: flex; flex-direction: column; gap: 10px; }
+    .card { background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px 14px; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .oid { font-family: monospace; font-size: 0.63rem; background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.25); border-radius: 4px; padding: 1px 6px; }
+    .card-title { font-size: 0.84rem; font-weight: 700; margin-top: 4px; }
+    .badges { display: flex; gap: 5px; align-items: center; }
+    .pri { font-size: 0.64rem; font-weight: 700; border-radius: 4px; padding: 1px 6px; }
+    .pri-high { background: rgba(239,68,68,0.15); color: #f87171; }
+    .pri-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .sts { font-size: 0.64rem; border-radius: 4px; padding: 1px 6px; font-weight: 600; }
+    .sts-completed { background: rgba(52,211,153,0.15); color: #34d399; }
+    .sts-in-progress { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .sts-pending { background: rgba(156,163,175,0.15); color: #9ca3af; }
+    .done-badge { font-size: 0.62rem; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); border-radius: 999px; padding: 1px 6px; font-weight: 600; }
+    .card-desc { font-size: 0.75rem; color: #d1d5db; margin-bottom: 6px; }
+    .tags { display: flex; gap: 4px; margin-bottom: 6px; }
+    .tag { font-family: monospace; font-size: 0.63rem; background: #111827; border: 1px solid #374151; border-radius: 999px; padding: 1px 6px; color: #9ca3af; }
+    .meta { font-size: 0.66rem; color: #9ca3af; margin-bottom: 6px; }
+    .card-actions { display: flex; gap: 6px; }
+    .btn-act { background: #111827; border: 1px solid #374151; color: #d1d5db; border-radius: 5px; padding: 4px 10px; font-size: 0.7rem; }
+    .btn-del { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div class="hdr">
+    <div class="logo">R<span>.</span></div>
+    <div style="color:#9ca3af;font-size:0.78rem">Rishi | 5th Sem IT B.Tech Portfolio</div>
+    <div class="badge">⚡ Practical 6 — Full Stack Integration</div>
+  </div>
+
+  <div class="sec-hdr">
+    <div>
+      <div class="sec-title">Full Stack CRUD Operations: React + Express + MongoDB</div>
+      <div class="sec-sub">React frontend making asynchronous HTTP requests to Node/Express REST API with MongoDB persistence</div>
+    </div>
+    <div class="status-badge">🟢 Connected: http://localhost:5000/api/tasks</div>
+  </div>
+
+  <div class="pipeline">
+    <span class="pipe-badge">Full Stack Flow</span>
+    <span class="pipe-step">1. React UI &amp; State</span> →
+    <span class="pipe-step">2. taskService (fetch)</span> →
+    <span class="pipe-step">3. Express API (:5000)</span> →
+    <span class="pipe-step">4. Mongoose Model</span> →
+    <span class="pipe-step">5. MongoDB Collection (:27017)</span>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-title">POST /api/tasks (Insert Task)</div>
+      <div class="form-group"><label>Task Title <span style="color:#f87171">*</span></label><div class="field">Implement Real-time Data Sync</div></div>
+      <div class="form-group"><label>Description</label><div class="field">Synchronize frontend state with MongoDB change streams.</div></div>
+      <div class="two-col">
+        <div class="form-group"><label>Priority</label><div class="field">High ▾</div></div>
+        <div class="form-group"><label>Due Date</label><div class="field">2026-11-12</div></div>
+      </div>
+      <div class="form-group"><label>Tags (comma-separated)</label><div class="field">react, socketio, mongodb</div></div>
+      <button class="btn-create">🚀 Dispatch POST Request</button>
+      <div style="margin-top:14px;padding-top:10px;border-top:1px solid #374151;font-size:0.7rem;color:#9ca3af;text-align:center;">
+        Target API: <code>http://localhost:5000/api/tasks</code>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="filter-bar">
+        <div class="panel-title" style="margin-bottom:0">GET /api/tasks — 3 Documents in MongoDB</div>
+        <div class="pills">
+          <span class="pill active">All</span>
+          <span class="pill">Pending</span>
+          <span class="pill">In Progress</span>
+          <span class="pill">Completed</span>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-top">
+            <div><span class="oid">🍃 6726f1a2…</span><div class="card-title">Wire React Frontend with Express API</div></div>
+            <div class="badges">
+              <span class="pri pri-high">High</span>
+              <span class="sts sts-completed">Completed</span>
+              <span class="done-badge">✔ Persisted</span>
+            </div>
+          </div>
+          <div class="card-desc">Use fetch() with async/await, handle HTTP 200/201/400/404 responses, and update state.</div>
+          <div class="tags"><span class="tag">#react</span><span class="tag">#express</span><span class="tag">#fullstack</span></div>
+          <div class="meta">📅 2026-11-05 · isCompleted: true · updatedAt: 14:20</div>
+          <div class="card-actions"><button class="btn-act">↻ PUT (Status)</button><button class="btn-act btn-del">🗑️ DELETE</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-top">
+            <div><span class="oid">🍃 6726f1a2…</span><div class="card-title">Configure CORS and Environment Variables</div></div>
+            <div class="badges">
+              <span class="pri pri-high">High</span>
+              <span class="sts sts-in-progress">In Progress</span>
+            </div>
+          </div>
+          <div class="card-desc">Allow cross-origin requests from React dev server (port 3000) to Express (port 5000).</div>
+          <div class="tags"><span class="tag">#cors</span><span class="tag">#security</span><span class="tag">#fullstack</span></div>
+          <div class="meta">📅 2026-11-08 · isCompleted: false · updatedAt: 11:00</div>
+          <div class="card-actions"><button class="btn-act">↻ PUT (Status)</button><button class="btn-act btn-del">🗑️ DELETE</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-top">
+            <div><span class="oid">🍃 6726f1a2…</span><div class="card-title">Test Full Stack CRUD Pipeline with MongoDB</div></div>
+            <div class="badges">
+              <span class="pri pri-medium">Medium</span>
+              <span class="sts sts-pending">Pending</span>
+            </div>
+          </div>
+          <div class="card-desc">Verify persistence across browser refreshes and check MongoDB collections.</div>
+          <div class="tags"><span class="tag">#testing</span><span class="tag">#mongodb</span><span class="tag">#qa</span></div>
+          <div class="meta">dueDate: null · isCompleted: false</div>
+          <div class="card-actions"><button class="btn-act">↻ PUT (Status)</button><button class="btn-act btn-del">🗑️ DELETE</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

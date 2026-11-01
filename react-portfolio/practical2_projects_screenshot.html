@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical 2: Projects Route</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    // Load preview_practical2 with route 'projects' and showArch=true
+    window.initialRoute = 'projects';
+    window.initialShowArch = true;
+  </script>
+  <!-- Load the main logic -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const studentData = {
+      name: "Rishi",
+      degree: "B.Tech in Information Technology",
+      semester: "5th Semester",
+      statusText: "5th Sem IT Undergrad • Open for Internships"
+    };
+    const rawProjects = [
+      {
+        id: 1,
+        title: "CampusHub — IT Resource & Event Portal",
+        category: "Full-Stack",
+        description: "A collaborative portal for IT department students to exchange semester notes, previous question papers, and track hackathons.",
+        tags: ["React", "Node.js", "MongoDB", "Express"],
+        github: "https://github.com/your-username/campushub",
+        live: "https://campushub-demo.vercel.app"
+      },
+      {
+        id: 2,
+        title: "SnipLink — URL Shortener & Analytics",
+        category: "Backend & Systems",
+        description: "High-performance link compressor with click rate analytics, geo-referrer charts, and Redis caching.",
+        tags: ["Node.js", "PostgreSQL", "Redis", "REST API"],
+        github: "https://github.com/your-username/sniplink",
+        live: "https://sniplink-demo.vercel.app"
+      },
+      {
+        id: 3,
+        title: "AlgoVisualizer — Pathfinding & Sorting",
+        category: "Algorithms",
+        description: "Interactive visualizer for Dijkstra, BFS, and sorting algorithms built to reinforce semester exam concepts.",
+        tags: ["JavaScript", "HTML5 Canvas", "Algorithms"],
+        github: "https://github.com/your-username/algovisualizer",
+        live: "https://algovisualizer-demo.vercel.app"
+      }
+    ];
+
+    function App() {
+      const [category, setCategory] = useState('All');
+      const [showArch, setShowArch] = useState(true);
+
+      const filterOptions = ['All', 'Full-Stack', 'Backend & Systems', 'Algorithms'];
+      const visibleProjects = category === 'All' ? rawProjects : rawProjects.filter(p => p.category === category);
+
+      return (
+        <div style={{ maxWidth: '760px', margin: '0 auto', padding: '1.5rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div style={{ background: '#f4f4f5', border: '1px dashed #2563eb', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <div>
+              <span style={{ background: '#2563eb', color: '#fff', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>Practical 2 Output</span>
+              <strong style={{ marginLeft: '0.5rem' }}>Route: /projects &bull; Reactive State Filtering</strong>
+            </div>
+            <span>Active Route: Projects</span>
+          </div>
+
+          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: '1px solid #e4e4e7', marginBottom: '1.5rem' }}>
+            <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>R<span style={{ color: '#2563eb' }}>.</span></span>
+            <nav style={{ display: 'flex', gap: '0.5rem' }}>
+              <span style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.875rem', color: '#71717a' }}>Home</span>
+              <span style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.875rem', background: '#eff6ff', color: '#2563eb', fontWeight: 600 }}>Projects (Active)</span>
+              <span style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.875rem', color: '#71717a' }}>Contact</span>
+            </nav>
+          </header>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <div>
+              <h1 style={{ fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>Featured Projects</h1>
+              <p style={{ fontSize: '0.885rem', color: '#52525b', marginTop: '0.2rem' }}>State-driven filtering and dynamic architecture view toggle.</p>
+            </div>
+            <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', background: '#f4f4f5', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid #e4e4e7' }}>Route: /projects</span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              {filterOptions.map(opt => (
+                <button
+                  key={opt}
+                  onClick={() => setCategory(opt)}
+                  style={{
+                    background: category === opt ? '#18181b' : '#f4f4f5',
+                    color: category === opt ? '#fff' : '#52525b',
+                    border: '1px solid #e4e4e7',
+                    borderRadius: '6px',
+                    padding: '0.35rem 0.75rem',
+                    fontSize: '0.8rem',
+                    fontWeight: category === opt ? 600 : 500,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {opt} {opt === 'All' ? '(3)' : ''}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowArch(prev => !prev)}
+              style={{ background: 'transparent', border: '1px dashed #2563eb', color: '#2563eb', borderRadius: '6px', padding: '0.35rem 0.75rem', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              {showArch ? 'Hide Architecture Notes 👁️' : 'Show Architecture Notes 👁️'}
+            </button>
+          </div>
+
+          <div style={{ fontSize: '0.825rem', color: '#71717a', marginBottom: '1rem' }}>
+            Showing <strong>{visibleProjects.length}</strong> of {rawProjects.length} projects for filter: <em>"{category}"</em>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {visibleProjects.map(p => (
+              <div key={p.id} style={{ background: '#fff', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 600, margin: 0 }}>{p.title}</h3>
+                    <span style={{ fontSize: '0.72rem', color: '#2563eb', background: '#eff6ff', padding: '0.1rem 0.45rem', borderRadius: '4px', fontFamily: 'monospace' }}>{p.category}</span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', background: '#f4f4f5', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid #e4e4e7', marginRight: '0.4rem' }}>Code ↗</span>
+                    <span style={{ fontSize: '0.75rem', background: '#eff6ff', color: '#2563eb', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>Demo ↗</span>
+                  </div>
+                </div>
+                <p style={{ fontSize: '0.885rem', color: '#52525b', margin: '0.4rem 0' }}>{p.description}</p>
+                
+                {showArch && (
+                  <div style={{ background: '#f4f4f5', borderLeft: '3px solid #2563eb', padding: '0.6rem 0.85rem', fontSize: '0.8rem', color: '#52525b', margin: '0.6rem 0', borderRadius: '4px' }}>
+                    <strong>Reactive State Note:</strong> Dynamically toggled via <code>showArch</code> boolean state. Instant client-side state re-rendering.
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.5rem' }}>
+                  {p.tags.map((t, idx) => (
+                    <span key={idx} style={{ fontSize: '0.75rem', fontFamily: 'monospace', background: '#f4f4f5', padding: '0.15rem 0.45rem', borderRadius: '4px', color: '#71717a' }}>{t}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

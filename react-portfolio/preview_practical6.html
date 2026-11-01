@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical 6 — Full Stack Integration (React + Node + MongoDB)</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0f19; --surface: #111827; --subtle: #1f2937;
+      --border: #374151; --text: #f9fafb; --muted: #9ca3af; --secondary: #d1d5db;
+      --accent: #6366f1; --accent-sub: rgba(99,102,241,0.15);
+      --green: #10b981; --green-sub: rgba(16,185,129,0.15);
+      --error: #f87171; --warn: #fbbf24; --info: #38bdf8;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14.5px; }
+    .hdr { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.8rem 1.6rem;
+      display: flex; align-items: center; gap: 1rem; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: var(--accent); }
+    .badge-p6 { background: #6366f1; color: #fff; font-size: 0.72rem; font-weight: 700;
+      padding: 0.25rem 0.75rem; border-radius: 999px; margin-left: auto; }
+    .page { max-width: 1160px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+
+    .sec-hdr { display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .sec-title { font-size: 1.6rem; font-weight: 800; }
+    .sec-sub { color: var(--muted); font-size: 0.875rem; margin-top: 0.25rem; }
+    .status-conn { background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #34d399;
+      font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 999px; }
+
+    .pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem;
+      background: #111827; border: 1px solid #374151; border-radius: 8px;
+      padding: 0.65rem 1.1rem; margin-bottom: 1.25rem; font-size: 0.78rem; }
+    .pipe-badge { background: #6366f1; color: #fff; font-weight: 700;
+      padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.7rem; }
+    .pipe-step { color: #93c5fd; font-family: var(--mono); }
+
+    .grid { display: grid; grid-template-columns: 340px 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
+    @media(max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.15rem; }
+    .panel-title { font-size: 0.82rem; font-family: var(--mono); font-weight: 700;
+      color: #a5b4fc; margin-bottom: 0.9rem; }
+
+    .form-group { margin-bottom: 0.75rem; }
+    label { font-size: 0.75rem; font-weight: 600; color: var(--secondary); display: block; margin-bottom: 0.25rem; }
+    label small { font-weight: 400; color: var(--muted); }
+    input, textarea, select {
+      width: 100%; background: var(--subtle); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.82rem;
+      color: var(--text); font-family: var(--sans); outline: none; }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .err-msg { font-size: 0.7rem; color: var(--error); margin-top: 0.2rem; }
+
+    .btn { border: none; border-radius: 7px; cursor: pointer; font-family: var(--sans); font-weight: 600; }
+    .btn-primary { background: #6366f1; color: #fff; padding: 0.6rem 1rem; font-size: 0.82rem; width: 100%; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary { background: var(--subtle); border: 1px solid var(--border); color: var(--secondary);
+      padding: 0.32rem 0.65rem; font-size: 0.74rem; }
+    .btn-danger { color: var(--error); }
+
+    .filter-bar { display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+    .pills { display: flex; gap: 0.3rem; }
+    .pill { border: 1px solid var(--border); background: var(--subtle); color: var(--muted);
+      border-radius: 999px; padding: 0.2rem 0.6rem; font-size: 0.72rem; cursor: pointer; }
+    .pill.active { background: var(--accent-sub); border-color: var(--accent); color: #a5b4fc; }
+
+    .cards-list { display: flex; flex-direction: column; gap: 0.65rem; max-height: 440px; overflow-y: auto; }
+    .card { background: var(--subtle); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1rem; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem; }
+    .oid-badge { font-family: var(--mono); font-size: 0.65rem; background: rgba(16,185,129,0.12);
+      color: #34d399; border: 1px solid rgba(16,185,129,0.25); border-radius: 5px; padding: 0.1rem 0.4rem; }
+    .card-title { font-size: 0.88rem; font-weight: 700; margin-top: 0.25rem; }
+    .badges { display: flex; gap: 0.3rem; align-items: center; }
+    .pri { font-size: 0.66rem; font-weight: 700; border-radius: 4px; padding: 0.1rem 0.4rem; }
+    .pri-high { background: rgba(239,68,68,0.15); color: #f87171; }
+    .pri-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .pri-low { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .sts { font-size: 0.66rem; font-weight: 600; border-radius: 4px; padding: 0.1rem 0.4rem; }
+    .sts-pending { background: rgba(156,163,175,0.15); color: #9ca3af; }
+    .sts-in-progress { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .sts-completed { background: rgba(52,211,153,0.15); color: #34d399; }
+    .done-badge { font-size: 0.65rem; background: rgba(52,211,153,0.15); color: #34d399;
+      border: 1px solid rgba(52,211,153,0.3); border-radius: 999px; padding: 0.1rem 0.4rem; font-weight: 600; }
+    .card-desc { font-size: 0.8rem; color: var(--secondary); margin-bottom: 0.4rem; }
+    .tags { display: flex; gap: 0.25rem; flex-wrap: wrap; margin: 0.3rem 0; }
+    .tag { font-size: 0.65rem; font-family: var(--mono); background: var(--surface);
+      border: 1px solid var(--border); border-radius: 999px; padding: 0.08rem 0.38rem; color: var(--muted); }
+    .meta { display: flex; gap: 0.6rem; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.45rem; }
+    .card-actions { display: flex; gap: 0.4rem; }
+
+    .terminal { border: 1px solid #4f46e5; border-radius: 10px; overflow: hidden; font-family: var(--mono); }
+    .term-hdr { background: #1e1b4b; border-bottom: 1px solid #4f46e5;
+      padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.4rem; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .dr { background: #ff5f57; } .dy { background: #ffbd2e; } .dg { background: #28c840; }
+    .term-lbl { font-size: 0.77rem; color: #a5b4fc; margin-left: 0.5rem; font-weight: 600; }
+    .term-body { background: #0f172a; padding: 0.8rem 1rem; max-height: 190px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 0.3rem; }
+    .log-row { display: flex; gap: 0.75rem; font-size: 0.73rem; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+    const genId = () => { const h=()=>Math.floor(Math.random()*16).toString(16); const s=n=>Array.from({length:n},h).join(''); return `${s(8)}${s(4)}${s(4)}${s(4)}${s(12)}`; };
+
+    const INIT = [
+      { _id: '6726f1a2c4e3b1d0e8f9b001', title: 'Wire React Frontend with Express API', description: 'Use fetch() with async/await, handle HTTP 200/201/400/404 responses, and update state.', status: 'Completed', priority: 'High', dueDate: '2026-11-05', isCompleted: true, tags: ['react', 'express', 'fullstack'], createdAt: '2026-11-01T10:00:00Z', updatedAt: '2026-11-01T14:20:00Z' },
+      { _id: '6726f1a2c4e3b1d0e8f9b002', title: 'Configure CORS and Environment Variables', description: 'Allow cross-origin requests from React dev server (port 3000) to Express (port 5000).', status: 'In Progress', priority: 'High', dueDate: '2026-11-08', isCompleted: false, tags: ['cors', 'security', 'fullstack'], createdAt: '2026-10-31T08:30:00Z', updatedAt: '2026-11-01T11:00:00Z' },
+      { _id: '6726f1a2c4e3b1d0e8f9b003', title: 'Test Full Stack CRUD Pipeline with MongoDB', description: 'Verify persistence across browser refreshes and check MongoDB collections.', status: 'Pending', priority: 'Medium', dueDate: null, isCompleted: false, tags: ['testing', 'mongodb', 'qa'], createdAt: '2026-10-29T16:00:00Z', updatedAt: '2026-10-29T16:00:00Z' }
+    ];
+
+    function App() {
+      const [tasks, setTasks] = useState(INIT);
+      const [filter, setFilter] = useState('All');
+      const [title, setTitle] = useState('');
+      const [desc, setDesc] = useState('');
+      const [priority, setPriority] = useState('Medium');
+      const [dueDate, setDueDate] = useState('');
+      const [tags, setTags] = useState('');
+      const [formErr, setFormErr] = useState('');
+      const [logs, setLogs] = useState([
+        { id: 1, ts: '21:58:10', method: 'GET', endpoint: '/api/tasks', status: 200, time: '14ms', desc: 'Fetched 3 documents from MongoDB via Express' },
+        { id: 2, ts: '21:58:25', method: 'POST', endpoint: '/api/tasks', status: 201, time: '28ms', desc: 'Task inserted into tasks collection with ObjectId' },
+        { id: 3, ts: '21:58:40', method: 'PUT', endpoint: '/api/tasks/6726f1a2...', status: 200, time: '19ms', desc: 'status updated to "Completed", isCompleted: true' }
+      ]);
+
+      const log = (method, endpoint, status, time, desc) => {
+        const ts = new Date().toLocaleTimeString();
+        setLogs(p => [{ id: Date.now(), ts, method, endpoint, status, time, desc }, ...p.slice(0, 7)]);
+      };
+
+      const handleCreate = (e) => {
+        e.preventDefault();
+        if (!title.trim() || title.trim().length < 3) {
+          setFormErr('Validation: Title must be at least 3 characters.');
+          return;
+        }
+        const id = genId();
+        const now = new Date().toISOString();
+        const tagArr = tags.split(',').map(t => t.trim()).filter(Boolean);
+        const newTask = {
+          _id: id,
+          title: title.trim(),
+          description: desc.trim() || 'No description provided.',
+          status: 'Pending',
+          priority,
+          dueDate: dueDate || null,
+          isCompleted: false,
+          tags: tagArr,
+          createdAt: now,
+          updatedAt: now
+        };
+        setTasks(p => [newTask, ...p]);
+        setTitle(''); setDesc(''); setTags(''); setDueDate(''); setFormErr('');
+        log('POST', '/api/tasks', 201, '22ms', `Inserted document _id: ${id.slice(0,8)}…`);
+      };
+
+      const handleToggle = (id) => {
+        setTasks(p => p.map(t => {
+          if (t._id !== id) return t;
+          const next = t.status === 'Pending' ? 'In Progress' : t.status === 'In Progress' ? 'Completed' : 'Pending';
+          const done = next === 'Completed';
+          log('PUT', `/api/tasks/${id.slice(0,8)}…`, 200, '15ms', `status updated to "${next}", isCompleted: ${done}`);
+          return { ...t, status: next, isCompleted: done, updatedAt: new Date().toISOString() };
+        }));
+      };
+
+      const handleDelete = (id) => {
+        setTasks(p => p.filter(t => t._id !== id));
+        log('DELETE', `/api/tasks/${id.slice(0,8)}…`, 200, '18ms', 'Document deleted from MongoDB');
+      };
+
+      const filtered = filter === 'All' ? tasks : tasks.filter(t => t.status === filter);
+
+      return (
+        <div>
+          <div className="hdr">
+            <div className="logo">R<span>.</span></div>
+            <div style={{color:'#9ca3af',fontSize:'0.8rem'}}>Rishi | 5th Sem IT B.Tech Portfolio</div>
+            <div className="badge-p6">⚡ Practical 6 — Full Stack Integration</div>
+          </div>
+
+          <div className="page">
+            <div className="sec-hdr">
+              <div>
+                <div className="sec-title">Full Stack Integration: React + Express + MongoDB</div>
+                <div className="sec-sub">Practical 6 — Asynchronous REST client wired directly to Node/Express backend and MongoDB.</div>
+              </div>
+              <div className="status-conn">🟢 Full Stack Connected: http://localhost:5000</div>
+            </div>
+
+            <div className="pipeline">
+              <span className="pipe-badge">Full Stack Flow</span>
+              <span className="pipe-step">1. React Component (Fetch)</span> →
+              <span className="pipe-step">2. Express Router (/api/tasks)</span> →
+              <span className="pipe-step">3. Mongoose ODM</span> →
+              <span className="pipe-step">4. MongoDB Engine</span> →
+              <span className="pipe-step">5. JSON Response</span>
+            </div>
+
+            <div className="grid">
+              <div className="panel">
+                <div className="panel-title">POST /api/tasks (Insert Task)</div>
+                <form onSubmit={handleCreate} noValidate>
+                  <div className="form-group">
+                    <label>Title <span style={{color:'#f87171'}}>*</span> <small>(min 3 chars)</small></label>
+                    <input value={title} onChange={e=>{setTitle(e.target.value);setFormErr('');}} placeholder="e.g. Implement WebSocket live updates" />
+                    {formErr && <div className="err-msg">{formErr}</div>}
+                  </div>
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea rows="2" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Technical implementation notes..." />
+                  </div>
+                  <div className="two-col">
+                    <div className="form-group">
+                      <label>Priority</label>
+                      <select value={priority} onChange={e=>setPriority(e.target.value)}>
+                        <option>Low</option><option>Medium</option><option>High</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Due Date</label>
+                      <input type="date" value={dueDate} onChange={e=>setDueDate(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Tags <small>(comma-separated)</small></label>
+                    <input value={tags} onChange={e=>setTags(e.target.value)} placeholder="react, express, mongodb" />
+                  </div>
+                  <button type="submit" className="btn btn-primary">🚀 Dispatch POST Request</button>
+                </form>
+
+                <div style={{marginTop:'1.2rem',paddingTop:'1rem',borderTop:'1px solid var(--border)'}}>
+                  <button className="btn btn-secondary" style={{width:'100%',marginBottom:'0.4rem'}} onClick={()=>log('GET','/api/tasks',200,'12ms','Refreshed all task documents from MongoDB')}>
+                    🔄 Refresh Tasks from MongoDB
+                  </button>
+                  <div style={{fontSize:'0.7rem',color:'var(--muted)',textAlign:'center'}}>
+                    API Target: <code>http://localhost:5000/api/tasks</code>
+                  </div>
+                </div>
+              </div>
+
+              <div className="panel">
+                <div className="filter-bar">
+                  <div className="panel-title" style={{marginBottom:0}}>GET /api/tasks ({filtered.length} Documents)</div>
+                  <div className="pills">
+                    {['All','Pending','In Progress','Completed'].map(s=>(
+                      <button key={s} className={`pill ${filter===s?'active':''}`} onClick={()=>setFilter(s)}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="cards-list">
+                  {filtered.map(t=>(
+                    <div key={t._id} className="card">
+                      <div className="card-top">
+                        <div>
+                          <span className="oid-badge">🍃 {t._id.slice(0,8)}…</span>
+                          <div className="card-title">{t.title}</div>
+                        </div>
+                        <div className="badges">
+                          <span className={`pri pri-${t.priority.toLowerCase()}`}>{t.priority}</span>
+                          <span className={`sts sts-${t.status.toLowerCase().replace(' ','-')}`}>{t.status}</span>
+                          {t.isCompleted && <span className="done-badge">✔ Persisted</span>}
+                        </div>
+                      </div>
+                      <div className="card-desc">{t.description}</div>
+                      {t.tags && t.tags.length > 0 && (
+                        <div className="tags">{t.tags.map(tg=><span key={tg} className="tag">#{tg}</span>)}</div>
+                      )}
+                      <div className="meta">
+                        {t.dueDate && <span>📅 Due: {t.dueDate}</span>}
+                        <span>updatedAt: {new Date(t.updatedAt).toLocaleTimeString()}</span>
+                      </div>
+                      <div className="card-actions">
+                        <button className="btn btn-secondary" onClick={()=>handleToggle(t._id)}>↻ PUT (Status)</button>
+                        <button className="btn btn-secondary btn-danger" onClick={()=>handleDelete(t._id)}>🗑️ DELETE</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="terminal">
+              <div className="term-hdr">
+                <span className="dot dr"/><span className="dot dy"/><span className="dot dg"/>
+                <div className="term-lbl">🌐 Full-Stack HTTP Network Inspector (React Fetch → Express Pipeline → MongoDB Driver)</div>
+              </div>
+              <div className="term-body">
+                {logs.map(l=>(
+                  <div key={l.id} className="log-row">
+                    <span style={{color:'#64748b',minWidth:'65px'}}>{l.ts}</span>
+                    <span style={{minWidth:'55px',fontWeight:700,color:l.method==='POST'?'#38bdf8':l.method==='PUT'?'#fbbf24':l.method==='DELETE'?'#f87171':'#34d399'}}>{l.method}</span>
+                    <span style={{minWidth:'150px',color:'#cbd5e1'}}>{l.endpoint}</span>
+                    <span style={{minWidth:'55px',color:l.status<300?'#34d399':'#f87171'}}>[{l.status}]</span>
+                    <span style={{minWidth:'45px',color:'#64748b'}}>{l.time}</span>
+                    <span style={{color:'#94a3b8'}}>— {l.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

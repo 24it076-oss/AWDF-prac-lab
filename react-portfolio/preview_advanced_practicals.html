@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITUE301 Advanced Web Development Frameworks — Weeks 10, 11, 12, 13</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #090d16; --surface: #0f172a; --subtle: #1e293b;
+      --border: #334155; --text: #f8fafc; --muted: #94a3b8; --secondary: #cbd5e1;
+      --accent: #6366f1; --green: #10b981; --error: #f87171; --warn: #fbbf24;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14.5px; }
+    .hdr { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.8rem 1.6rem;
+      display: flex; align-items: center; gap: 1rem; }
+    .logo { font-weight: 800; font-size: 1.3rem; }
+    .logo span { color: var(--accent); }
+    .page { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+
+    .uni-banner { background: #1e1b4b; border: 1px solid #4338ca; border-radius: 10px; padding: 1.1rem 1.4rem; margin-bottom: 1.25rem; }
+    .uni-tag { font-size: 0.72rem; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+    .uni-title { font-size: 1.45rem; font-weight: 800; color: #f8fafc; margin: 0.2rem 0; }
+    .uni-sub { font-size: 0.82rem; color: #c7d2fe; }
+
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .tab { background: var(--subtle); border: 1px solid var(--border); color: #cbd5e1; border-radius: 7px; padding: 0.4rem 0.85rem; font-size: 0.78rem; cursor: pointer; }
+    .tab.active { background: #4f46e5; color: #fff; border-color: #6366f1; font-weight: 700; }
+
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; margin-bottom: 1.25rem; }
+    .panel-title { font-size: 0.82rem; font-family: var(--mono); font-weight: 700; color: #818cf8; margin-bottom: 0.9rem; }
+
+    .form-group { margin-bottom: 0.8rem; }
+    label { font-size: 0.75rem; font-weight: 600; color: var(--secondary); display: block; margin-bottom: 0.25rem; }
+    input { width: 100%; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.82rem; color: var(--text); outline: none; }
+    input:focus { border-color: var(--accent); }
+
+    .btn { border: none; border-radius: 7px; cursor: pointer; font-family: var(--sans); font-weight: 600; padding: 0.55rem 1rem; font-size: 0.82rem; }
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-secondary { background: var(--subtle); border: 1px solid var(--border); color: #cbd5e1; font-size: 0.75rem; }
+
+    .grid-2 { display: grid; grid-template-columns: 360px 1fr; gap: 1.25rem; }
+    @media(max-width: 780px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media(max-width: 780px) { .grid-3 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--subtle); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    function App() {
+      const [week, setWeek] = useState('week10');
+
+      // Week 10 state
+      const [w10Title, setW10Title] = useState('Implement Redis Pub/Sub Queue');
+      const [w10Logs, setW10Logs] = useState([
+        { id: 1, type: 'sync', label: '⚡ [API RESPONSE (T0)]', text: 'HTTP 201 Created sent to client immediately at: 22:15:00.100Z (Duration: 4.2ms)' },
+        { id: 2, type: 'async', label: '🔔 [EVENT-DRIVEN BACKGROUND (T1)]', text: "taskEmitter.on('task:created') executed at: 22:15:00.128Z (Delta: +28ms, Non-blocking)" }
+      ]);
+
+      const triggerEvent = (e) => {
+        e.preventDefault();
+        const t0 = new Date();
+        const t0Str = t0.toISOString();
+        const t1 = new Date(t0.getTime() + Math.floor(Math.random()*25+15));
+        const delta = t1.getTime() - t0.getTime();
+        setW10Logs(p => [
+          { id: Date.now()+1, type: 'async', label: '🔔 [EVENT-DRIVEN BACKGROUND (T1)]', text: `taskEmitter.on('task:created') -> Logged notification for "${w10Title}" at: ${t1.toISOString()} (Delta: +${delta}ms non-blocking)` },
+          { id: Date.now(), type: 'sync', label: '⚡ [API RESPONSE (T0)]', text: `HTTP 201 Created returned to client for "${w10Title}" at: ${t0Str} (Immediate, 3.8ms)` },
+          ...p.slice(0, 5)
+        ]);
+      };
+
+      // Week 11 state
+      const [composeUp, setComposeUp] = useState(true);
+
+      // Week 12 state
+      const [ciStatus, setCiStatus] = useState('passed');
+      const [ciLogs, setCiLogs] = useState([
+        'PASS task-manager-api/__tests__/auth.test.js (1.4s)',
+        'PASS task-manager-api/__tests__/tasks.test.js (2.1s)',
+        'PASS react-portfolio/src/App.test.js (0.8s)',
+        '✔ 14/14 automated tests passed across all tiers'
+      ]);
+
+      const triggerCI = (fail) => {
+        if (fail) {
+          setCiStatus('failed');
+          setCiLogs([
+            'FAIL task-manager-api/__tests__/authValidation.test.js',
+            '  ● validateRegisterInput › rejects invalid email',
+            '    Expected status 400 Bad Request but received 200 OK',
+            '✖ 1/14 automated tests failed. CI/CD build aborted.'
+          ]);
+        } else {
+          setCiStatus('passed');
+          setCiLogs([
+            'PASS task-manager-api/__tests__/auth.test.js (1.4s)',
+            'PASS task-manager-api/__tests__/tasks.test.js (2.1s)',
+            'PASS react-portfolio/src/App.test.js (0.8s)',
+            '✔ 14/14 automated tests passed across all tiers'
+          ]);
+        }
+      };
+
+      // Week 13 state
+      const [aiTitle, setAiTitle] = useState('Implement OAuth2 Google Social Sign-in');
+      const [aiRes, setAiRes] = useState({
+        desc: 'Integrate Passport.js with GoogleStrategy to allow single-click authentication. Ensure secure token storage, state verification against CSRF attacks, and scope validation.',
+        pri: 'High',
+        deadline: '2026-11-12'
+      });
+
+      const generateAI = (e) => {
+        e.preventDefault();
+        const pri = aiTitle.toLowerCase().includes('bug') ? 'High' : 'Medium';
+        setAiRes({
+          desc: `Technical specification for "${aiTitle}". Covers architectural design, REST endpoints, data persistence, and regression validation.`,
+          pri,
+          deadline: '2026-11-15'
+        });
+      };
+
+      return (
+        <div>
+          <div className="hdr">
+            <div className="logo">R<span>.</span></div>
+            <div style={{color:'#94a3b8',fontSize:'0.8rem'}}>Rishi | 5th Sem IT B.Tech Portfolio</div>
+            <div style={{background:'#4f46e5',color:'#fff',fontSize:'0.72rem',fontWeight:700,padding:'0.2rem 0.6rem',borderRadius:'999px',marginLeft:'auto'}}>
+              CHARUSAT ITUE301
+            </div>
+          </div>
+
+          <div className="page">
+            <div className="uni-banner">
+              <div className="uni-tag">CHAROTAR UNIVERSITY OF SCIENCE AND TECHNOLOGY · FTE · B.TECH IT</div>
+              <div className="uni-title">Advanced Web Development Frameworks (ITUE301)</div>
+              <div className="uni-sub">Weeks 10 to 13: Asynchronous Event-Driven Architecture, Docker Compose, CI/CD, and AI Integration</div>
+            </div>
+
+            <div className="tabs">
+              <button className={`tab ${week==='week10'?'active':''}`} onClick={()=>setWeek('week10')}>⚡ Week 10: Event-Driven EventEmitter</button>
+              <button className={`tab ${week==='week11'?'active':''}`} onClick={()=>setWeek('week11')}>🐳 Week 11: Docker &amp; Compose</button>
+              <button className={`tab ${week==='week12'?'active':''}`} onClick={()=>setWeek('week12')}>🔄 Week 12: GitHub Actions CI/CD</button>
+              <button className={`tab ${week==='week13'?'active':''}`} onClick={()=>setWeek('week13')}>🤖 Week 13: AI API Integration</button>
+            </div>
+
+            {week === 'week10' && (
+              <div>
+                <div style={{marginBottom:'1rem'}}>
+                  <h2 style={{fontSize:'1.3rem',fontWeight:800}}>Week 10: Asynchronous Processing with Event-Driven Architecture</h2>
+                  <p style={{fontSize:'0.82rem',color:'#94a3b8'}}>To implement asynchronous background processing using Node.js native EventEmitter without external dependencies.</p>
+                </div>
+
+                <div className="grid-2">
+                  <div className="panel">
+                    <div className="panel-title">Trigger Event-Driven Task Creation</div>
+                    <form onSubmit={triggerEvent}>
+                      <div className="form-group">
+                        <label>Task Title</label>
+                        <input value={w10Title} onChange={e=>setW10Title(e.target.value)} />
+                      </div>
+                      <button type="submit" className="btn btn-primary" style={{width:'100%'}}>🚀 Emit 'task:created' &amp; Return Immediate 201</button>
+                    </form>
+                    <div style={{fontSize:'0.73rem',color:'#94a3b8',marginTop:'1rem',lineHeight:'1.5'}}>
+                      <strong>Non-Blocking Proof:</strong> The main HTTP response terminates at T0 immediately. Background notifications execute via <code>setImmediate</code> at T1 without delaying the client.
+                    </div>
+                  </div>
+
+                  <div className="panel">
+                    <div className="panel-title">Synchronous vs Asynchronous Execution Log</div>
+                    <div style={{display:'flex',flexDirection:'column',gap:'0.5rem'}}>
+                      {w10Logs.map(l => (
+                        <div key={l.id} style={{background:l.type==='sync'?'#082f49':'#042f2e',border:`1px solid ${l.type==='sync'?'#0369a1':'#0d9488'}`,borderRadius:'6px',padding:'0.65rem 0.85rem'}}>
+                          <div style={{fontSize:'0.7rem',fontWeight:700,color:l.type==='sync'?'#38bdf8':'#2dd4bf',marginBottom:'0.2rem'}}>{l.label}</div>
+                          <div style={{fontSize:'0.75rem',fontFamily:'JetBrains Mono,monospace'}}>{l.text}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {week === 'week11' && (
+              <div>
+                <div style={{marginBottom:'1rem'}}>
+                  <h2 style={{fontSize:'1.3rem',fontWeight:800}}>Week 11: Containerization with Docker and Docker Compose</h2>
+                  <p style={{fontSize:'0.82rem',color:'#94a3b8'}}>To containerize the full-stack application using Docker and orchestrate services using Docker Compose.</p>
+                </div>
+
+                <div className="panel">
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
+                    <div className="panel-title" style={{marginBottom:0}}>docker-compose.yml · 3 Container Microservices Topology</div>
+                    <button className="btn btn-secondary" onClick={()=>setComposeUp(p=>!p)}>
+                      {composeUp ? '🛑 Stop Containers' : '▶ docker-compose up'}
+                    </button>
+                  </div>
+
+                  <div className="grid-3">
+                    <div className="card">
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <strong style={{color:'#60a5fa'}}>frontend</strong>
+                        <span style={{fontSize:'0.65rem',background:composeUp?'#065f46':'#7f1d1d',color:'#fff',padding:'2px 6px',borderRadius:'4px'}}>{composeUp?'RUNNING':'STOPPED'}</span>
+                      </div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8',marginTop:'0.4rem'}}>Dockerfile: Multi-stage React + Nginx</div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8'}}>Port: 3000:80</div>
+                    </div>
+
+                    <div className="card">
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <strong style={{color:'#a78bfa'}}>backend</strong>
+                        <span style={{fontSize:'0.65rem',background:composeUp?'#065f46':'#7f1d1d',color:'#fff',padding:'2px 6px',borderRadius:'4px'}}>{composeUp?'RUNNING':'STOPPED'}</span>
+                      </div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8',marginTop:'0.4rem'}}>Dockerfile: Node 18 Alpine Express</div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8'}}>Port: 5000:5000</div>
+                    </div>
+
+                    <div className="card">
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <strong style={{color:'#34d399'}}>mongodb</strong>
+                        <span style={{fontSize:'0.65rem',background:composeUp?'#065f46':'#7f1d1d',color:'#fff',padding:'2px 6px',borderRadius:'4px'}}>{composeUp?'RUNNING':'STOPPED'}</span>
+                      </div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8',marginTop:'0.4rem'}}>Image: mongo:7.0</div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8'}}>Port: 27017:27017</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {week === 'week12' && (
+              <div>
+                <div style={{marginBottom:'1rem'}}>
+                  <h2 style={{fontSize:'1.3rem',fontWeight:800}}>Week 12: CI/CD Pipeline with GitHub Actions</h2>
+                  <p style={{fontSize:'0.82rem',color:'#94a3b8'}}>To automate testing and deployment of the application using a CI/CD pipeline.</p>
+                </div>
+
+                <div style={{display:'flex',gap:'0.4rem',marginBottom:'1rem'}}>
+                  <button className="btn btn-secondary" style={{color:'#34d399'}} onClick={()=>triggerCI(false)}>✔ Run Passing Pipeline</button>
+                  <button className="btn btn-secondary" style={{color:'#f87171'}} onClick={()=>triggerCI(true)}>⚠️ Demonstrate Broken Test Failure</button>
+                </div>
+
+                <div className="panel" style={{border:`1px solid ${ciStatus==='passed'?'#059669':'#dc2626'}`}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.75rem'}}>
+                    <strong>{ciStatus==='passed'?'🟢 CI/CD BUILD PASSED':'🔴 CI/CD BUILD FAILED'} (.github/workflows/ci.yml)</strong>
+                    <span style={{fontSize:'0.72rem',color:'#94a3b8'}}>Branch: main</span>
+                  </div>
+                  <div style={{background:'#030712',borderRadius:'6px',padding:'0.8rem',fontFamily:'JetBrains Mono,monospace',fontSize:'0.75rem'}}>
+                    {ciLogs.map((l, i) => (
+                      <div key={i} style={{color:l.includes('PASS')||l.includes('✔')?'#34d399':l.includes('FAIL')||l.includes('✖')?'#f87171':'#94a3b8'}}>{l}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {week === 'week13' && (
+              <div>
+                <div style={{marginBottom:'1rem'}}>
+                  <h2 style={{fontSize:'1.3rem',fontWeight:800}}>Week 13: AI API Integration into a Web Application</h2>
+                  <p style={{fontSize:'0.82rem',color:'#94a3b8'}}>To integrate an external AI service into the application with graceful degradation and responsible AI usage.</p>
+                </div>
+
+                <div className="grid-2">
+                  <div className="panel">
+                    <div className="panel-title">Smart AI Task Planner</div>
+                    <form onSubmit={generateAI}>
+                      <div className="form-group">
+                        <label>Task Title to Enhance</label>
+                        <input value={aiTitle} onChange={e=>setAiTitle(e.target.value)} />
+                      </div>
+                      <button type="submit" className="btn btn-primary" style={{width:'100%'}}>✨ Generate with Gemini AI</button>
+                    </form>
+                  </div>
+
+                  <div className="panel">
+                    <div className="panel-title">AI Suggested Metadata</div>
+                    <div style={{background:'var(--subtle)',borderRadius:'6px',padding:'0.8rem'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.5rem'}}>
+                        <strong>{aiTitle}</strong>
+                        <span style={{fontSize:'0.68rem',background:'rgba(239,68,68,0.15)',color:'#f87171',padding:'2px 6px',borderRadius:'4px'}}>AI Priority: {aiRes.pri}</span>
+                      </div>
+                      <div style={{fontSize:'0.78rem',color:'#cbd5e1',marginBottom:'0.6rem'}}>{aiRes.desc}</div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8',borderTop:'1px solid var(--border)',paddingTop:'0.4rem'}}>
+                        📅 Suggested Deadline: {aiRes.deadline} · Engine: Google Gemini API
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical 4: Express Middleware Pipeline & Logger Output</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body style="margin: 0; padding: 1.5rem; background: #fafafa; font-family: 'Plus Jakarta Sans', sans-serif;">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App() {
+      const logs = [
+        { id: 1, text: '[2026-11-01T15:45:00Z] GET /api/tasks -> 200 OK (11ms)', type: 'success' },
+        { id: 2, text: '[2026-11-01T15:45:03Z] POST /api/tasks -> 201 Created (18ms) - Task #4 Created', type: 'success' },
+        { id: 3, text: '[2026-11-01T15:45:06Z] PUT /api/tasks/2 -> 200 OK (9ms) - Status updated to In Progress', type: 'info' },
+        { id: 4, text: '[2026-11-01T15:45:08Z] DELETE /api/tasks/3 -> 200 OK (14ms) - Task deleted', type: 'warn' },
+        { id: 5, text: '[2026-11-01T15:45:12Z] POST /api/tasks -> 400 Bad Request (Validator: title cannot be empty)', type: 'error' },
+        { id: 6, text: '[2026-11-01T15:45:15Z] GET /api/tasks/99999 -> 404 Not Found (Global Error Handler caught 404)', type: 'error' }
+      ];
+
+      return (
+        <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+          <div style={{ background: '#f4f4f5', border: '1px dashed #2563eb', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <div>
+              <span style={{ background: '#2563eb', color: '#fff', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>Practical 4 Output</span>
+              <strong style={{ marginLeft: '0.5rem' }}>Express Middleware Pipeline &bull; Request Logger &amp; Global Error Handler</strong>
+            </div>
+            <span>Middleware Diagnostics</span>
+          </div>
+
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>
+            Express Middleware Pipeline Inspection
+          </h2>
+          <p style={{ fontSize: '0.885rem', color: '#52525b', margin: '0 0 1.25rem 0' }}>
+            Demonstrates <code>requestLogger</code> interception, status code tracking, execution timing (ms), and 4-argument global error handling.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ background: '#fff', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '1rem' }}>
+              <span style={{ fontSize: '0.72rem', color: '#71717a', textTransform: 'uppercase', fontFamily: 'monospace' }}>Middleware 1</span>
+              <strong style={{ display: 'block', fontSize: '0.95rem', marginTop: '0.25rem' }}>requestLogger</strong>
+              <p style={{ fontSize: '0.8rem', color: '#52525b', margin: '0.25rem 0 0 0' }}>Intercepts HTTP Method, URL, status code, &amp; duration</p>
+            </div>
+            <div style={{ background: '#fff', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '1rem' }}>
+              <span style={{ fontSize: '0.72rem', color: '#71717a', textTransform: 'uppercase', fontFamily: 'monospace' }}>Middleware 2</span>
+              <strong style={{ display: 'block', fontSize: '0.95rem', marginTop: '0.25rem' }}>validateTaskPayload</strong>
+              <p style={{ fontSize: '0.8rem', color: '#52525b', margin: '0.25rem 0 0 0' }}>Validates required fields, returns 400 Bad Request on failure</p>
+            </div>
+            <div style={{ background: '#fff', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '1rem' }}>
+              <span style={{ fontSize: '0.72rem', color: '#71717a', textTransform: 'uppercase', fontFamily: 'monospace' }}>Middleware 3</span>
+              <strong style={{ display: 'block', fontSize: '0.95rem', marginTop: '0.25rem' }}>errorHandler (Global)</strong>
+              <p style={{ fontSize: '0.8rem', color: '#52525b', margin: '0.25rem 0 0 0' }}>Standardized JSON error formatting: <code>(err,req,res,next)</code></p>
+            </div>
+          </div>
+
+          {/* Terminal Console View */}
+          <div style={{ background: '#09090b', border: '1px solid #27272a', borderRadius: '10px', overflow: 'hidden', fontFamily: 'JetBrains Mono, monospace', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
+            <div style={{ background: '#18181b', padding: '0.65rem 1rem', display: 'flex', alignItems: 'center', gap: '0.45rem', borderBottom: '1px solid #27272a' }}>
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444', display: 'inline-block' }}></span>
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }}></span>
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }}></span>
+              <span style={{ fontSize: '0.775rem', color: '#a1a1aa', marginLeft: '0.4rem' }}>
+                bash &mdash; node server.js (Live Express Request Logger Middleware Stream)
+              </span>
+            </div>
+
+            <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8rem' }}>
+              <div style={{ color: '#60a5fa' }}>🚀 [Server] Task Management REST API Server listening at http://localhost:5000</div>
+              <div style={{ color: '#71717a' }}>─── Pipeline Active: cors() &rarr; requestLogger &rarr; express.json() &rarr; taskRoutes &rarr; errorHandler ───</div>
+              {logs.map(l => (
+                <div key={l.id} style={{
+                  color: l.type === 'success' ? '#34d399' : l.type === 'error' ? '#f87171' : l.type === 'warn' ? '#fbbf24' : '#60a5fa'
+                }}>
+                  {l.text}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
